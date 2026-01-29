@@ -7,11 +7,9 @@
 ## Version: 2.6.0
 ## X-Curse-Project-ID: 686482
 ## X-Wago-ID: 5NRejvG3
+## SavedVariablesPerCharacter: AutoQuestsDB
 
-# Main app
-main.lua
-
-# Locale
+# Locale (load first!)
 locale/default.lua
 locale/enGB.lua
 locale/enUS.lua
@@ -28,3 +26,10 @@ locale/koKR.lua
 locale/esES.lua
 locale/zhTW.lua
 locale/enTW.lua
+
+# Settings
+settings.lua
+options.lua
+
+# Main app
+main.lua

@@ -66,8 +66,6 @@ function Settings.Initialize()
             AutoQuestsDB.misc[key] = value
         end
     end
-
-    print("[AutoQuests] Settings initialized successfully")
 end
 
 -- Flow getters and setters
@@ -364,8 +362,6 @@ end
 
 -- Initialize immediately on load
 Settings.Initialize()
-print("[AutoQuests] Settings initialized. Locale:", GetLocale())
 
 -- Export Settings to global namespace
 _G.AutoQuestsSettings = Settings
-print("[AutoQuests] Settings exported to global namespace")

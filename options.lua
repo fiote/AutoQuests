@@ -39,7 +39,7 @@ function OptionsPanel.CreatePanel()
 
     -- Auto Accept Checkbox
     local autoAcceptCheckbox = CreateFrame("CheckButton", "AutoQuestsAutoAcceptCheckbox", frame, "UICheckButtonTemplate")
-    autoAcceptCheckbox:SetPoint("TOPLEFT", flowsDivider, "BOTTOMLEFT", 0, -10)
+    autoAcceptCheckbox:SetPoint("TOPLEFT", flowsDivider, "BOTTOMLEFT", 0, -6)
     autoAcceptCheckbox:SetChecked(Settings.IsAutoAcceptEnabled())
     autoAcceptCheckbox:SetScript("OnClick", function(self)
         Settings.SetAutoAcceptEnabled(self:GetChecked())
@@ -57,7 +57,7 @@ function OptionsPanel.CreatePanel()
 
     -- Auto Complete Checkbox
     local autoCompleteCheckbox = CreateFrame("CheckButton", "AutoQuestsAutoCompleteCheckbox", frame, "UICheckButtonTemplate")
-    autoCompleteCheckbox:SetPoint("TOPLEFT", autoAcceptCheckbox, "BOTTOMLEFT", 0, -6)
+    autoCompleteCheckbox:SetPoint("TOPLEFT", autoAcceptCheckbox, "BOTTOMLEFT", 0, -2)
     autoCompleteCheckbox:SetChecked(Settings.IsAutoCompleteEnabled())
     autoCompleteCheckbox:SetScript("OnClick", function(self)
         Settings.SetAutoCompleteEnabled(self:GetChecked())
@@ -70,7 +70,7 @@ function OptionsPanel.CreatePanel()
 
     -- Auto Select Gossips Checkbox
     local autoSelectGossipsCheckbox = CreateFrame("CheckButton", "AutoQuestsAutoSelectGossipsCheckbox", frame, "UICheckButtonTemplate")
-    autoSelectGossipsCheckbox:SetPoint("TOPLEFT", autoCompleteCheckbox, "BOTTOMLEFT", 0, -6)
+    autoSelectGossipsCheckbox:SetPoint("TOPLEFT", autoCompleteCheckbox, "BOTTOMLEFT", 0, -2)
     autoSelectGossipsCheckbox:SetChecked(Settings.IsAutoSelectGossipsEnabled())
     autoSelectGossipsCheckbox:SetScript("OnClick", function(self)
         Settings.SetAutoSelectGossipsEnabled(self:GetChecked())
@@ -96,7 +96,7 @@ function OptionsPanel.CreatePanel()
 
     -- Normal Quests Unfinished
     local normalUnfinishedCheckbox = CreateFrame("CheckButton", "AutoQuestsNormalUnfinishedCheckbox", frame, "UICheckButtonTemplate")
-    normalUnfinishedCheckbox:SetPoint("TOPLEFT", filtersDivider, "BOTTOMLEFT", 0, -10)
+    normalUnfinishedCheckbox:SetPoint("TOPLEFT", filtersDivider, "BOTTOMLEFT", 0, -6)
     normalUnfinishedCheckbox:SetChecked(Settings.IsNormalQuestsUnfinishedEnabled())
     normalUnfinishedCheckbox:SetScript("OnClick", function(self)
         Settings.SetNormalQuestsUnfinishedEnabled(self:GetChecked())
@@ -109,7 +109,7 @@ function OptionsPanel.CreatePanel()
 
     -- Normal Quests Finished
     local normalFinishedCheckbox = CreateFrame("CheckButton", "AutoQuestsNormalFinishedCheckbox", frame, "UICheckButtonTemplate")
-    normalFinishedCheckbox:SetPoint("TOPLEFT", normalUnfinishedCheckbox, "BOTTOMLEFT", 0, -6)
+    normalFinishedCheckbox:SetPoint("TOPLEFT", normalUnfinishedCheckbox, "BOTTOMLEFT", 0, -2)
     normalFinishedCheckbox:SetChecked(Settings.IsNormalQuestsFinishedEnabled())
     normalFinishedCheckbox:SetScript("OnClick", function(self)
         Settings.SetNormalQuestsFinishedEnabled(self:GetChecked())
@@ -122,7 +122,7 @@ function OptionsPanel.CreatePanel()
 
     -- Campaign Quests Unfinished
     local campaignUnfinishedCheckbox = CreateFrame("CheckButton", "AutoQuestsCampaignUnfinishedCheckbox", frame, "UICheckButtonTemplate")
-    campaignUnfinishedCheckbox:SetPoint("TOPLEFT", normalFinishedCheckbox, "BOTTOMLEFT", 0, -6)
+    campaignUnfinishedCheckbox:SetPoint("TOPLEFT", normalFinishedCheckbox, "BOTTOMLEFT", 0, -2)
     campaignUnfinishedCheckbox:SetChecked(Settings.IsCampaignQuestsUnfinishedEnabled())
     campaignUnfinishedCheckbox:SetScript("OnClick", function(self)
         Settings.SetCampaignQuestsUnfinishedEnabled(self:GetChecked())
@@ -135,7 +135,7 @@ function OptionsPanel.CreatePanel()
 
     -- Campaign Quests Finished
     local campaignFinishedCheckbox = CreateFrame("CheckButton", "AutoQuestsCampaignFinishedCheckbox", frame, "UICheckButtonTemplate")
-    campaignFinishedCheckbox:SetPoint("TOPLEFT", campaignUnfinishedCheckbox, "BOTTOMLEFT", 0, -6)
+    campaignFinishedCheckbox:SetPoint("TOPLEFT", campaignUnfinishedCheckbox, "BOTTOMLEFT", 0, -2)
     campaignFinishedCheckbox:SetChecked(Settings.IsCampaignQuestsFinishedEnabled())
     campaignFinishedCheckbox:SetScript("OnClick", function(self)
         Settings.SetCampaignQuestsFinishedEnabled(self:GetChecked())
@@ -148,7 +148,7 @@ function OptionsPanel.CreatePanel()
 
     -- Repeatable Quests
     local repeatableCheckbox = CreateFrame("CheckButton", "AutoQuestsRepeatableCheckbox", frame, "UICheckButtonTemplate")
-    repeatableCheckbox:SetPoint("TOPLEFT", campaignFinishedCheckbox, "BOTTOMLEFT", 0, -6)
+    repeatableCheckbox:SetPoint("TOPLEFT", campaignFinishedCheckbox, "BOTTOMLEFT", 0, -2)
     repeatableCheckbox:SetChecked(Settings.IsRepeatableQuestsEnabled())
     repeatableCheckbox:SetScript("OnClick", function(self)
         Settings.SetRepeatableQuestsEnabled(self:GetChecked())
@@ -159,9 +159,22 @@ function OptionsPanel.CreatePanel()
     repeatableLabel:SetText(L.REPEATABLE_QUESTS)
     repeatableLabel:SetTextColor(1, 1, 1)
 
+    -- Bounty Quests
+    local bountyCheckbox = CreateFrame("CheckButton", "AutoQuestsBountyCheckbox", frame, "UICheckButtonTemplate")
+    bountyCheckbox:SetPoint("TOPLEFT", repeatableCheckbox, "BOTTOMLEFT", 0, -2)
+    bountyCheckbox:SetChecked(Settings.IsBountyQuestsEnabled())
+    bountyCheckbox:SetScript("OnClick", function(self)
+        Settings.SetBountyQuestsEnabled(self:GetChecked())
+    end)
+
+    local bountyLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    bountyLabel:SetPoint("LEFT", bountyCheckbox, "RIGHT", 8, 0)
+    bountyLabel:SetText(L.BOUNTY_QUESTS)
+    bountyLabel:SetTextColor(1, 1, 1)
+
     -- World Quests
     local worldCheckbox = CreateFrame("CheckButton", "AutoQuestsWorldCheckbox", frame, "UICheckButtonTemplate")
-    worldCheckbox:SetPoint("TOPLEFT", repeatableCheckbox, "BOTTOMLEFT", 0, -6)
+    worldCheckbox:SetPoint("TOPLEFT", bountyCheckbox, "BOTTOMLEFT", 0, -2)
     worldCheckbox:SetChecked(Settings.IsWorldQuestsEnabled())
     worldCheckbox:SetScript("OnClick", function(self)
         Settings.SetWorldQuestsEnabled(self:GetChecked())
@@ -174,7 +187,7 @@ function OptionsPanel.CreatePanel()
 
     -- Meta Quests
     local metaCheckbox = CreateFrame("CheckButton", "AutoQuestsMetaCheckbox", frame, "UICheckButtonTemplate")
-    metaCheckbox:SetPoint("TOPLEFT", worldCheckbox, "BOTTOMLEFT", 0, -6)
+    metaCheckbox:SetPoint("TOPLEFT", worldCheckbox, "BOTTOMLEFT", 0, -2)
     metaCheckbox:SetChecked(Settings.IsMetaQuestsEnabled())
     metaCheckbox:SetScript("OnClick", function(self)
         Settings.SetMetaQuestsEnabled(self:GetChecked())
@@ -200,7 +213,7 @@ function OptionsPanel.CreatePanel()
 
     -- Debug Checkbox
     local debugCheckbox = CreateFrame("CheckButton", "AutoQuestsDebugCheckbox", frame, "UICheckButtonTemplate")
-    debugCheckbox:SetPoint("TOPLEFT", miscDivider, "BOTTOMLEFT", 0, -10)
+    debugCheckbox:SetPoint("TOPLEFT", miscDivider, "BOTTOMLEFT", 0, -6)
     debugCheckbox:SetChecked(Settings.IsDebugEnabled())
     debugCheckbox:SetScript("OnClick", function(self)
         Settings.SetDebugEnabled(self:GetChecked())

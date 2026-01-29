@@ -28,6 +28,7 @@ if GetLocale() == "enUS" then
   L.CAMPAIGN_UNFINISHED = "Campaign Quests (Not Completed by Warband)"
   L.CAMPAIGN_FINISHED = "Campaign Quests (Completed by Warband)"
   L.REPEATABLE_QUESTS = "Repeatable Quests"
+  L.BOUNTY_QUESTS = "Bounty Quests"
   L.WORLD_QUESTS = "World Quests"
   L.META_QUESTS = "Meta Quests"
 

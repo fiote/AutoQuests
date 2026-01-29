@@ -19,6 +19,7 @@ local DEFAULTS = {
         campaignQuestsUnfinished = false,
         campaignQuestsFinished = true,
         repeatableQuests = true,
+        bountyQuests = false,
         worldQuests = false,
         metaQuests = false,
     },
@@ -132,6 +133,14 @@ function Settings.SetRepeatableQuestsEnabled(value)
     AutoQuestsDB.filters.repeatableQuests = value
 end
 
+function Settings.IsBountyQuestsEnabled()
+    return AutoQuestsDB.filters.bountyQuests
+end
+
+function Settings.SetBountyQuestsEnabled(value)
+    AutoQuestsDB.filters.bountyQuests = value
+end
+
 function Settings.IsWorldQuestsEnabled()
     return AutoQuestsDB.filters.worldQuests
 end
@@ -168,6 +177,7 @@ end
     Returns true only if ALL applicable quest types are enabled.
 
     Quest types checked:
+    - Bounty: C_QuestLog.IsQuestBounty
     - Normal: not important, repeatable, world, or meta
     - Campaign: C_QuestLog.IsImportantQuest
     - Repeatable: C_QuestLog.IsRepeatableQuest
@@ -180,6 +190,7 @@ function Settings.MatchesFilters(questId)
         return false
     end
 
+    local isBounty = C_QuestLog.IsQuestBounty(questId)
     local isImportant = C_QuestLog.IsImportantQuest(questId)
     local isRepeatable = C_QuestLog.IsRepeatableQuest(questId)
     local isWorld = C_QuestLog.IsWorldQuest(questId)
@@ -189,7 +200,9 @@ function Settings.MatchesFilters(questId)
     -- Determine quest types
     local questTypes = {}
 
-    if isImportant then
+    if isBounty then
+        questTypes.bounty = true
+    elseif isImportant then
         questTypes.campaign = true
     elseif isWorld then
         questTypes.world = true
@@ -207,6 +220,9 @@ function Settings.MatchesFilters(questId)
     end
 
     -- Check if all applicable types are enabled
+    if questTypes.bounty and not Settings.IsBountyQuestsEnabled() then
+        return false
+    end
     if questTypes.normalUnfinished and not Settings.IsNormalQuestsUnfinishedEnabled() then
         return false
     end
@@ -241,7 +257,9 @@ function Settings.GetQuestCategory(questId)
         return "Unknown"
     end
 
-    if C_QuestLog.IsImportantQuest(questId) then
+    if C_QuestLog.IsQuestBounty(questId) then
+        return "Bounty Quest"
+    elseif C_QuestLog.IsImportantQuest(questId) then
         if C_QuestLog.IsQuestFlaggedCompletedOnAccount(questId) then
             return "Campaign (Warband Completed)"
         else

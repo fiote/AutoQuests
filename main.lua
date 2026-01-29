@@ -90,7 +90,13 @@ end
 ]]
 function HandleAcceptQuest()
     local questId = C_QuestLog.GetSelectedQuest()
-    -- If we can't get the quest from the log, use the last one selected from gossip
+
+    -- If we can't get the quest from the log, use GetQuestID() which works during QUEST_DETAIL
+    if not questId or questId == 0 then
+        questId = GetQuestID()
+    end
+
+    -- If still no questId, use the last one selected from gossip
     if not questId or questId == 0 then
         questId = lastSelectedQuestId
     end

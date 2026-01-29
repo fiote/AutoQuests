@@ -103,13 +103,13 @@ function HandleAcceptQuest()
 
     local questInfo = GetQuestInfo(questId)
     if questInfo and Settings.IsDebugEnabled() then
-        printMessage("[AutoQuests DEBUG] HandleAcceptQuest called. Quest: '" .. questInfo.title .. "' (" .. questInfo.category .. ")")
+        printMessage("[AutoQuests] HandleAcceptQuest called. Quest: '" .. questInfo.title .. "' (" .. questInfo.category .. ")")
     end
 
     questInfo = GetQuestInfo(questId)
     if not questInfo then
         if Settings.IsDebugEnabled() then
-            printMessage("[AutoQuests DEBUG] HandleAcceptQuest: Could not get quest info for questId: " .. (questId or "nil"))
+            printMessage("[AutoQuests] HandleAcceptQuest: Could not get quest info for questId: " .. (questId or "nil"))
         end
         return
     end
@@ -120,7 +120,7 @@ function HandleAcceptQuest()
 
     LogQuestProcessing(questInfo, "auto-accepting")
     if Settings.IsDebugEnabled() then
-        printMessage("[AutoQuests DEBUG] Calling AcceptQuest()")
+        printMessage("[AutoQuests] Calling AcceptQuest()")
     end
     AcceptQuest()
 end
@@ -131,12 +131,12 @@ end
 ]]
 function OnQuestProgress()
     local questId = C_QuestLog.GetSelectedQuest()
-    printMessage("[AutoQuests DEBUG] OnQuestProgress called for questId: " .. tostring(questId))
+    printMessage("[AutoQuests] OnQuestProgress called for questId: " .. tostring(questId))
     local questInfo = GetQuestInfo(questId)
     if questInfo then
-        printMessage("[AutoQuests DEBUG] Quest: '" .. questInfo.title .. "' (" .. questInfo.category .. ")")
+        printMessage("[AutoQuests] Quest: '" .. questInfo.title .. "' (" .. questInfo.category .. ")")
     else
-        printMessage("[AutoQuests DEBUG] Could not get quest info for questId: " .. tostring(questId))
+        printMessage("[AutoQuests] Could not get quest info for questId: " .. tostring(questId))
         return
     end
 
@@ -145,7 +145,7 @@ function OnQuestProgress()
     end
 
     LogQuestProcessing(questInfo, "auto-completing")
-    printMessage("[AutoQuests DEBUG] Calling CompleteQuest()")
+    printMessage("[AutoQuests] Calling CompleteQuest()")
     CompleteQuest()
 end
 
@@ -156,7 +156,7 @@ end
 function HandleQuestAutocomplete(questId)
     local questInfo = GetQuestInfo(questId)
     if questInfo and Settings.IsDebugEnabled() then
-        printMessage("[AutoQuests DEBUG] HandleQuestAutocomplete called. Quest: '" .. questInfo.title .. "' (" .. questInfo.category .. ")")
+        printMessage("[AutoQuests] HandleQuestAutocomplete called. Quest: '" .. questInfo.title .. "' (" .. questInfo.category .. ")")
     end
 
     questInfo = GetQuestInfo(questId)
@@ -242,7 +242,7 @@ function HandleGossipShow()
 									local category = Settings.GetQuestCategory(quest.questID)
 									if Settings.IsDebugEnabled() then
 											printMessage("[AutoQuests] Quest '" .. quest.title .. "' detected as " .. category .. ", auto-accepting...")
-											printMessage("[AutoQuests DEBUG] Calling C_GossipInfo.SelectAvailableQuest for questID: " .. quest.questID)
+											printMessage("[AutoQuests] Calling C_GossipInfo.SelectAvailableQuest for questID: " .. quest.questID)
 									end
 									lastSelectedQuestId = quest.questID  -- Store for use in QUEST_DETAIL
 									C_GossipInfo.SelectAvailableQuest(quest.questID)
@@ -254,7 +254,7 @@ function HandleGossipShow()
 
 		if not acceptedAnyQuest and nActive > 0 then
 				if Settings.IsAutoCompleteEnabled() then
-						printMessage("[AutoQuests DEBUG] Gossip has " .. nActive .. " active quests, auto-complete enabled")
+						printMessage("[AutoQuests] Gossip has " .. nActive .. " active quests, auto-complete enabled")
 						for i, quest in ipairs(activeQuests) do
 								local isComplete = quest.isComplete
 								local matchesFilters = Settings.MatchesFilters(quest.questID)
@@ -264,16 +264,16 @@ function HandleGossipShow()
 
 								Settings.OutputAllFlags(quest.questID)
 
-								printMessage("[AutoQuests] Quest '" .. quest.title .. "' detected as " .. category .. " (matches filters? " .. tostring(matchesFilters));
+								printMessage("[AutoQuests] Quest '" .. quest.title .. "' detected as " .. category .. " (matches filters? " .. tostring(matchesFilters)..")")
 
 								if isComplete and matchesFilters then
 										printMessage("[AutoQuests] Auto-completing...")
-										printMessage("[AutoQuests DEBUG] Calling C_GossipInfo.SelectActiveQuest for questID: " .. quest.questID)
+										printMessage("[AutoQuests] Calling C_GossipInfo.SelectActiveQuest for questID: " .. quest.questID)
 										C_GossipInfo.SelectActiveQuest(quest.questID)
 								end
 						end
 				else
-						printMessage("[AutoQuests DEBUG] Gossip has " .. nActive .. " active quests, but auto-complete is DISABLED")
+						printMessage("[AutoQuests] Gossip has " .. nActive .. " active quests, but auto-complete is DISABLED")
 				end
 		end
 end
@@ -282,10 +282,10 @@ end
     Fonction pour gérer l'événement QUEST_GREETING
 ]]
 function HandleQuestGreeting()
-    printMessage("[AutoQuests DEBUG] HandleQuestGreeting called")
+    printMessage("[AutoQuests] HandleQuestGreeting called")
     local availableQuestsCount = GetNumAvailableQuests()
     local activeQuestsCount = GetNumActiveQuests()
-    printMessage("[AutoQuests DEBUG] Available quests: " .. availableQuestsCount .. ", Active quests: " .. activeQuestsCount)
+    printMessage("[AutoQuests] Available quests: " .. availableQuestsCount .. ", Active quests: " .. activeQuestsCount)
 
     if availableQuestsCount > 0 then
         if Settings.IsAutoAcceptEnabled() then
@@ -329,11 +329,11 @@ function HandleQuestCompletion()
     local questId = C_QuestLog.GetSelectedQuest()
     local questInfo = GetQuestInfo(questId)
     local rewardCount = GetNumQuestChoices()
-    printMessage("[AutoQuests DEBUG] HandleQuestCompletion called for questId: " .. tostring(questId))
+    printMessage("[AutoQuests] HandleQuestCompletion called for questId: " .. tostring(questId))
     if questInfo then
-        printMessage("[AutoQuests DEBUG] Quest: '" .. questInfo.title .. "' (" .. questInfo.category .. "), Reward count: " .. rewardCount)
+        printMessage("[AutoQuests] Quest: '" .. questInfo.title .. "' (" .. questInfo.category .. "), Reward count: " .. rewardCount)
     else
-        printMessage("[AutoQuests DEBUG] Could not get quest info")
+        printMessage("[AutoQuests] Could not get quest info")
     end
 
     if rewardCount > 1 then
@@ -341,10 +341,10 @@ function HandleQuestCompletion()
         PlaySound(5274, "master")
     elseif (rewardCount == 0 or rewardCount == 1) and Settings.IsAutoCompleteEnabled() then
         printMessage("[AutoQuests] Auto-selecting reward for '" .. (questInfo and questInfo.title or "Unknown") .. "'")
-        printMessage("[AutoQuests DEBUG] Calling GetQuestReward(" .. defaultRewardIndex .. ")")
+        printMessage("[AutoQuests] Calling GetQuestReward(" .. defaultRewardIndex .. ")")
         GetQuestReward(defaultRewardIndex)
     else
-        printMessage("[AutoQuests DEBUG] Not auto-selecting reward (rewardCount=" .. rewardCount .. ", autoComplete=" .. tostring(Settings.IsAutoCompleteEnabled()) .. ")")
+        printMessage("[AutoQuests] Not auto-selecting reward (rewardCount=" .. rewardCount .. ", autoComplete=" .. tostring(Settings.IsAutoCompleteEnabled()) .. ")")
     end
 end
 

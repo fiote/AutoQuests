@@ -20,6 +20,9 @@ local DEFAULTS = {
         campaignQuestsFinished = true,
         repeatableQuests = true,
         bountyQuests = false,
+        taskQuests = false,
+        trivialQuests = false,
+        invasionQuests = false,
         worldQuests = false,
         metaQuests = false,
     },
@@ -141,6 +144,30 @@ function Settings.SetBountyQuestsEnabled(value)
     AutoQuestsDB.filters.bountyQuests = value
 end
 
+function Settings.IsTaskQuestsEnabled()
+    return AutoQuestsDB.filters.taskQuests
+end
+
+function Settings.SetTaskQuestsEnabled(value)
+    AutoQuestsDB.filters.taskQuests = value
+end
+
+function Settings.IsTrivialQuestsEnabled()
+    return AutoQuestsDB.filters.trivialQuests
+end
+
+function Settings.SetTrivialQuestsEnabled(value)
+    AutoQuestsDB.filters.trivialQuests = value
+end
+
+function Settings.IsInvasionQuestsEnabled()
+    return AutoQuestsDB.filters.invasionQuests
+end
+
+function Settings.SetInvasionQuestsEnabled(value)
+    AutoQuestsDB.filters.invasionQuests = value
+end
+
 function Settings.IsWorldQuestsEnabled()
     return AutoQuestsDB.filters.worldQuests
 end
@@ -191,6 +218,9 @@ function Settings.MatchesFilters(questId)
     end
 
     local isBounty = C_QuestLog.IsQuestBounty(questId)
+    local isTask = C_QuestLog.IsQuestTask(questId)
+    local isTrivial = C_QuestLog.IsQuestTrivial(questId)
+    local isInvasion = C_QuestLog.IsQuestInvasion(questId)
     local isImportant = C_QuestLog.IsImportantQuest(questId)
     local isRepeatable = C_QuestLog.IsRepeatableQuest(questId)
     local isWorld = C_QuestLog.IsWorldQuest(questId)
@@ -202,6 +232,12 @@ function Settings.MatchesFilters(questId)
 
     if isBounty then
         questTypes.bounty = true
+    elseif isTask then
+        questTypes.task = true
+    elseif isTrivial then
+        questTypes.trivial = true
+    elseif isInvasion then
+        questTypes.invasion = true
     elseif isImportant then
         questTypes.campaign = true
     elseif isWorld then
@@ -221,6 +257,15 @@ function Settings.MatchesFilters(questId)
 
     -- Check if all applicable types are enabled
     if questTypes.bounty and not Settings.IsBountyQuestsEnabled() then
+        return false
+    end
+    if questTypes.task and not Settings.IsTaskQuestsEnabled() then
+        return false
+    end
+    if questTypes.trivial and not Settings.IsTrivialQuestsEnabled() then
+        return false
+    end
+    if questTypes.invasion and not Settings.IsInvasionQuestsEnabled() then
         return false
     end
     if questTypes.normalUnfinished and not Settings.IsNormalQuestsUnfinishedEnabled() then
@@ -259,6 +304,12 @@ function Settings.GetQuestCategory(questId)
 
     if C_QuestLog.IsQuestBounty(questId) then
         return "Bounty Quest"
+    elseif C_QuestLog.IsQuestTask(questId) then
+        return "Task Quest"
+    elseif C_QuestLog.IsQuestTrivial(questId) then
+        return "Trivial Quest"
+    elseif C_QuestLog.IsQuestInvasion(questId) then
+        return "Invasion Quest"
     elseif C_QuestLog.IsImportantQuest(questId) then
         if C_QuestLog.IsQuestFlaggedCompletedOnAccount(questId) then
             return "Campaign (Warband Completed)"

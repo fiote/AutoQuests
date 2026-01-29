@@ -102,6 +102,9 @@ function OptionsPanel.CreatePanel()
         {name = "AutoQuestsCampaignFinishedCheckbox", getter = Settings.IsCampaignQuestsFinishedEnabled, setter = Settings.SetCampaignQuestsFinishedEnabled, label = L.CAMPAIGN_FINISHED},
         {name = "AutoQuestsRepeatableCheckbox", getter = Settings.IsRepeatableQuestsEnabled, setter = Settings.SetRepeatableQuestsEnabled, label = L.REPEATABLE_QUESTS},
         {name = "AutoQuestsBountyCheckbox", getter = Settings.IsBountyQuestsEnabled, setter = Settings.SetBountyQuestsEnabled, label = L.BOUNTY_QUESTS},
+        {name = "AutoQuestsTaskCheckbox", getter = Settings.IsTaskQuestsEnabled, setter = Settings.SetTaskQuestsEnabled, label = L.TASK_QUESTS},
+        {name = "AutoQuestsTrivialCheckbox", getter = Settings.IsTrivialQuestsEnabled, setter = Settings.SetTrivialQuestsEnabled, label = L.TRIVIAL_QUESTS},
+        {name = "AutoQuestsInvasionCheckbox", getter = Settings.IsInvasionQuestsEnabled, setter = Settings.SetInvasionQuestsEnabled, label = L.INVASION_QUESTS},
         {name = "AutoQuestsWorldCheckbox", getter = Settings.IsWorldQuestsEnabled, setter = Settings.SetWorldQuestsEnabled, label = L.WORLD_QUESTS},
         {name = "AutoQuestsMetaCheckbox", getter = Settings.IsMetaQuestsEnabled, setter = Settings.SetMetaQuestsEnabled, label = L.META_QUESTS},
     })

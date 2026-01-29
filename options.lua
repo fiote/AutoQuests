@@ -8,15 +8,9 @@ local Settings = _G.AutoQuestsSettings
 local OptionsPanel = {}
 
 function OptionsPanel.CreatePanel()
-    print("[AutoQuests] Creating options panel")
-
     -- Create main frame
     local frame = CreateFrame("Frame", "AutoQuestsOptionsFrame", UIParent)
     frame.name = "AutoQuests"
-
-    print("[AutoQuests] Frame created, name:", frame.name)
-    print("[AutoQuests] L.AUTO_ACCEPT:", L.AUTO_ACCEPT)
-    print("[AutoQuests] L.FLOWS_TITLE:", L.FLOWS_TITLE)
 
     -- Title label
     local titleLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
@@ -115,10 +109,8 @@ function OptionsPanel.CreatePanel()
     })
 
     -- Register with Blizzard Settings
-    print("[AutoQuests] Registering with Blizzard Settings API")
     local category = _G.Settings.RegisterCanvasLayoutCategory(frame, "AutoQuests")
     _G.Settings.RegisterAddOnCategory(category)
-    print("[AutoQuests] Options panel registered successfully")
 
     return frame
 end

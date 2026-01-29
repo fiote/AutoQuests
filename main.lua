@@ -376,7 +376,6 @@ SlashCmdList["AUTOQUEST"] = function(msg)
         enabled = false
         printMessage(L.TITLE .. L.DISABLE)
     elseif exec == "settings" or exec == "options" then
-        print("[AutoQuests] Opening settings panel")
         Settings.OpenPanel()
     else
         local statusMessage = enabled and L.ENABLE or L.DISABLE
@@ -390,8 +389,6 @@ loginFrame = CreateFrame("Frame")
 loginFrame:RegisterEvent("PLAYER_LOGIN")
 loginFrame:SetScript("OnEvent", function(self, event)
     if event == "PLAYER_LOGIN" then
-        print("[AutoQuests] PLAYER_LOGIN event fired")
-        print("[AutoQuests] Creating options panel now that locales are loaded")
         _G.AutoQuestsOptionsPanel.CreatePanel()
         RegisterAutoQuestsEvents()
     end

@@ -24,205 +24,92 @@ function OptionsPanel.CreatePanel()
     titleLabel:SetText(L.OPTIONS_PANEL_NAME or "AutoQuests")
     titleLabel:SetTextColor(1, 1, 1)
 
+    -- Helper function to create a checkbox with label
+    local function createCheckboxOption(parent, name, anchor, anchorPoint, getter, setter, labelText, offset)
+        local checkbox = CreateFrame("CheckButton", name, parent, "UICheckButtonTemplate")
+        checkbox:SetPoint("TOPLEFT", anchor, anchorPoint, 0, offset)
+        checkbox:SetChecked(getter())
+        checkbox:SetScript("OnClick", function(self)
+            setter(self:GetChecked())
+        end)
+
+        local label = parent:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        label:SetPoint("LEFT", checkbox, "RIGHT", 8, 0)
+        label:SetText(labelText)
+        label:SetTextColor(1, 1, 1)
+
+        return checkbox
+    end
+
+    -- Helper function to create a section with title, divider, and options
+    local function createOptionsSection(parent, sectionTitle, anchor, anchorOffset, options)
+        -- Section title
+        local title = parent:CreateFontString(nil, "OVERLAY", "GameFontNormalMed1")
+        title:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, anchorOffset)
+        title:SetText(sectionTitle)
+        title:SetTextColor(1, 0.82, 0)
+
+        -- Divider line
+        local divider = parent:CreateLine()
+        divider:SetColorTexture(0.5, 0.5, 0.5, 0.5)
+        divider:SetThickness(1)
+        divider:SetStartPoint("LEFT", title, "BOTTOMLEFT", 0, -4)
+        divider:SetEndPoint("RIGHT", title, "BOTTOMRIGHT", -16, -4)
+
+        -- Create options
+        local lastCheckbox = divider
+				local first = true
+				local firstOffset = -10
+				local otherOffset = 6
+
+        for _, option in ipairs(options) do
+						local offset = otherOffset
+						if first then
+							offset = firstOffset
+							first = false
+						end
+
+            lastCheckbox = createCheckboxOption(
+                parent,
+                option.name,
+                lastCheckbox,
+                "BOTTOMLEFT",
+                option.getter,
+                option.setter,
+                option.label,
+								offset
+            )
+            if lastCheckbox == divider then
+                lastCheckbox:SetPoint("TOPLEFT", divider, "BOTTOMLEFT", 0, -20)
+            end
+        end
+
+        return lastCheckbox
+    end
+
     -- FLOWS SECTION
-    local flowsTitle = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalMed1")
-    flowsTitle:SetPoint("TOPLEFT", titleLabel, "BOTTOMLEFT", 0, -20)
-    flowsTitle:SetText(L.FLOWS_TITLE)
-    flowsTitle:SetTextColor(1, 0.82, 0)  -- Golden yellow like Auto Turn-in
-
-    -- Divider line after flows title
-    local flowsDivider = frame:CreateLine()
-    flowsDivider:SetColorTexture(0.5, 0.5, 0.5, 0.5)
-    flowsDivider:SetThickness(1)
-    flowsDivider:SetStartPoint("LEFT", flowsTitle, "BOTTOMLEFT", 0, -4)
-    flowsDivider:SetEndPoint("RIGHT", flowsTitle, "BOTTOMRIGHT", -16, -4)
-
-    -- Auto Accept Checkbox
-    local autoAcceptCheckbox = CreateFrame("CheckButton", "AutoQuestsAutoAcceptCheckbox", frame, "UICheckButtonTemplate")
-    autoAcceptCheckbox:SetPoint("TOPLEFT", flowsDivider, "BOTTOMLEFT", 0, -6)
-    autoAcceptCheckbox:SetChecked(Settings.IsAutoAcceptEnabled())
-    autoAcceptCheckbox:SetScript("OnClick", function(self)
-        Settings.SetAutoAcceptEnabled(self:GetChecked())
-    end)
-    print("[AutoQuests] Auto Accept checkbox created at:", autoAcceptCheckbox:GetPoint())
-
-    local autoAcceptLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    print("[AutoQuests] Auto Accept label created")
-    autoAcceptLabel:SetPoint("LEFT", autoAcceptCheckbox, "RIGHT", 8, 0)
-    print("[AutoQuests] Label positioned at:", autoAcceptLabel:GetPoint())
-    autoAcceptLabel:SetText(L.AUTO_ACCEPT)
-    print("[AutoQuests] Label text set to:", L.AUTO_ACCEPT)
-    autoAcceptLabel:SetTextColor(1, 1, 1)
-    print("[AutoQuests] Label color set")
-
-    -- Auto Complete Checkbox
-    local autoCompleteCheckbox = CreateFrame("CheckButton", "AutoQuestsAutoCompleteCheckbox", frame, "UICheckButtonTemplate")
-    autoCompleteCheckbox:SetPoint("TOPLEFT", autoAcceptCheckbox, "BOTTOMLEFT", 0, -2)
-    autoCompleteCheckbox:SetChecked(Settings.IsAutoCompleteEnabled())
-    autoCompleteCheckbox:SetScript("OnClick", function(self)
-        Settings.SetAutoCompleteEnabled(self:GetChecked())
-    end)
-
-    local autoCompleteLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    autoCompleteLabel:SetPoint("LEFT", autoCompleteCheckbox, "RIGHT", 8, 0)
-    autoCompleteLabel:SetText(L.AUTO_TURN_IN)
-    autoCompleteLabel:SetTextColor(1, 1, 1)  -- White like other labels
-
-    -- Auto Select Gossips Checkbox
-    local autoSelectGossipsCheckbox = CreateFrame("CheckButton", "AutoQuestsAutoSelectGossipsCheckbox", frame, "UICheckButtonTemplate")
-    autoSelectGossipsCheckbox:SetPoint("TOPLEFT", autoCompleteCheckbox, "BOTTOMLEFT", 0, -2)
-    autoSelectGossipsCheckbox:SetChecked(Settings.IsAutoSelectGossipsEnabled())
-    autoSelectGossipsCheckbox:SetScript("OnClick", function(self)
-        Settings.SetAutoSelectGossipsEnabled(self:GetChecked())
-    end)
-
-    local autoSelectGossipsLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    autoSelectGossipsLabel:SetPoint("LEFT", autoSelectGossipsCheckbox, "RIGHT", 8, 0)
-    autoSelectGossipsLabel:SetText(L.AUTO_SELECT_GOSSIPS)
-    autoSelectGossipsLabel:SetTextColor(1, 1, 1)
+    local flowsAnchor = createOptionsSection(frame, L.FLOWS_TITLE, titleLabel, -20, {
+        {name = "AutoQuestsAutoAcceptCheckbox", getter = Settings.IsAutoAcceptEnabled, setter = Settings.SetAutoAcceptEnabled, label = L.AUTO_ACCEPT},
+        {name = "AutoQuestsAutoCompleteCheckbox", getter = Settings.IsAutoCompleteEnabled, setter = Settings.SetAutoCompleteEnabled, label = L.AUTO_TURN_IN},
+        {name = "AutoQuestsAutoSelectGossipsCheckbox", getter = Settings.IsAutoSelectGossipsEnabled, setter = Settings.SetAutoSelectGossipsEnabled, label = L.AUTO_SELECT_GOSSIPS},
+    })
 
     -- FILTERS SECTION
-    local filtersTitle = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalMed1")
-    filtersTitle:SetPoint("TOPLEFT", autoSelectGossipsCheckbox, "BOTTOMLEFT", 0, -20)
-    filtersTitle:SetText(L.FILTERS_TITLE)
-    filtersTitle:SetTextColor(1, 0.82, 0)  -- Golden yellow like Auto Turn-in
-
-    -- Divider line after filters title
-    local filtersDivider = frame:CreateLine()
-    filtersDivider:SetColorTexture(0.5, 0.5, 0.5, 0.5)
-    filtersDivider:SetThickness(1)
-    filtersDivider:SetStartPoint("LEFT", filtersTitle, "BOTTOMLEFT", 0, -4)
-    filtersDivider:SetEndPoint("RIGHT", filtersTitle, "BOTTOMRIGHT", -16, -4)
-
-    -- Normal Quests Unfinished
-    local normalUnfinishedCheckbox = CreateFrame("CheckButton", "AutoQuestsNormalUnfinishedCheckbox", frame, "UICheckButtonTemplate")
-    normalUnfinishedCheckbox:SetPoint("TOPLEFT", filtersDivider, "BOTTOMLEFT", 0, -6)
-    normalUnfinishedCheckbox:SetChecked(Settings.IsNormalQuestsUnfinishedEnabled())
-    normalUnfinishedCheckbox:SetScript("OnClick", function(self)
-        Settings.SetNormalQuestsUnfinishedEnabled(self:GetChecked())
-    end)
-
-    local normalUnfinishedLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    normalUnfinishedLabel:SetPoint("LEFT", normalUnfinishedCheckbox, "RIGHT", 8, 0)
-    normalUnfinishedLabel:SetText(L.NORMAL_UNFINISHED)
-    normalUnfinishedLabel:SetTextColor(1, 1, 1)
-
-    -- Normal Quests Finished
-    local normalFinishedCheckbox = CreateFrame("CheckButton", "AutoQuestsNormalFinishedCheckbox", frame, "UICheckButtonTemplate")
-    normalFinishedCheckbox:SetPoint("TOPLEFT", normalUnfinishedCheckbox, "BOTTOMLEFT", 0, -2)
-    normalFinishedCheckbox:SetChecked(Settings.IsNormalQuestsFinishedEnabled())
-    normalFinishedCheckbox:SetScript("OnClick", function(self)
-        Settings.SetNormalQuestsFinishedEnabled(self:GetChecked())
-    end)
-
-    local normalFinishedLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    normalFinishedLabel:SetPoint("LEFT", normalFinishedCheckbox, "RIGHT", 8, 0)
-    normalFinishedLabel:SetText(L.NORMAL_FINISHED)
-    normalFinishedLabel:SetTextColor(1, 1, 1)
-
-    -- Campaign Quests Unfinished
-    local campaignUnfinishedCheckbox = CreateFrame("CheckButton", "AutoQuestsCampaignUnfinishedCheckbox", frame, "UICheckButtonTemplate")
-    campaignUnfinishedCheckbox:SetPoint("TOPLEFT", normalFinishedCheckbox, "BOTTOMLEFT", 0, -2)
-    campaignUnfinishedCheckbox:SetChecked(Settings.IsCampaignQuestsUnfinishedEnabled())
-    campaignUnfinishedCheckbox:SetScript("OnClick", function(self)
-        Settings.SetCampaignQuestsUnfinishedEnabled(self:GetChecked())
-    end)
-
-    local campaignUnfinishedLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    campaignUnfinishedLabel:SetPoint("LEFT", campaignUnfinishedCheckbox, "RIGHT", 8, 0)
-    campaignUnfinishedLabel:SetText(L.CAMPAIGN_UNFINISHED)
-    campaignUnfinishedLabel:SetTextColor(1, 1, 1)
-
-    -- Campaign Quests Finished
-    local campaignFinishedCheckbox = CreateFrame("CheckButton", "AutoQuestsCampaignFinishedCheckbox", frame, "UICheckButtonTemplate")
-    campaignFinishedCheckbox:SetPoint("TOPLEFT", campaignUnfinishedCheckbox, "BOTTOMLEFT", 0, -2)
-    campaignFinishedCheckbox:SetChecked(Settings.IsCampaignQuestsFinishedEnabled())
-    campaignFinishedCheckbox:SetScript("OnClick", function(self)
-        Settings.SetCampaignQuestsFinishedEnabled(self:GetChecked())
-    end)
-
-    local campaignFinishedLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    campaignFinishedLabel:SetPoint("LEFT", campaignFinishedCheckbox, "RIGHT", 8, 0)
-    campaignFinishedLabel:SetText(L.CAMPAIGN_FINISHED)
-    campaignFinishedLabel:SetTextColor(1, 1, 1)
-
-    -- Repeatable Quests
-    local repeatableCheckbox = CreateFrame("CheckButton", "AutoQuestsRepeatableCheckbox", frame, "UICheckButtonTemplate")
-    repeatableCheckbox:SetPoint("TOPLEFT", campaignFinishedCheckbox, "BOTTOMLEFT", 0, -2)
-    repeatableCheckbox:SetChecked(Settings.IsRepeatableQuestsEnabled())
-    repeatableCheckbox:SetScript("OnClick", function(self)
-        Settings.SetRepeatableQuestsEnabled(self:GetChecked())
-    end)
-
-    local repeatableLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    repeatableLabel:SetPoint("LEFT", repeatableCheckbox, "RIGHT", 8, 0)
-    repeatableLabel:SetText(L.REPEATABLE_QUESTS)
-    repeatableLabel:SetTextColor(1, 1, 1)
-
-    -- Bounty Quests
-    local bountyCheckbox = CreateFrame("CheckButton", "AutoQuestsBountyCheckbox", frame, "UICheckButtonTemplate")
-    bountyCheckbox:SetPoint("TOPLEFT", repeatableCheckbox, "BOTTOMLEFT", 0, -2)
-    bountyCheckbox:SetChecked(Settings.IsBountyQuestsEnabled())
-    bountyCheckbox:SetScript("OnClick", function(self)
-        Settings.SetBountyQuestsEnabled(self:GetChecked())
-    end)
-
-    local bountyLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    bountyLabel:SetPoint("LEFT", bountyCheckbox, "RIGHT", 8, 0)
-    bountyLabel:SetText(L.BOUNTY_QUESTS)
-    bountyLabel:SetTextColor(1, 1, 1)
-
-    -- World Quests
-    local worldCheckbox = CreateFrame("CheckButton", "AutoQuestsWorldCheckbox", frame, "UICheckButtonTemplate")
-    worldCheckbox:SetPoint("TOPLEFT", bountyCheckbox, "BOTTOMLEFT", 0, -2)
-    worldCheckbox:SetChecked(Settings.IsWorldQuestsEnabled())
-    worldCheckbox:SetScript("OnClick", function(self)
-        Settings.SetWorldQuestsEnabled(self:GetChecked())
-    end)
-
-    local worldLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    worldLabel:SetPoint("LEFT", worldCheckbox, "RIGHT", 8, 0)
-    worldLabel:SetText(L.WORLD_QUESTS)
-    worldLabel:SetTextColor(1, 1, 1)
-
-    -- Meta Quests
-    local metaCheckbox = CreateFrame("CheckButton", "AutoQuestsMetaCheckbox", frame, "UICheckButtonTemplate")
-    metaCheckbox:SetPoint("TOPLEFT", worldCheckbox, "BOTTOMLEFT", 0, -2)
-    metaCheckbox:SetChecked(Settings.IsMetaQuestsEnabled())
-    metaCheckbox:SetScript("OnClick", function(self)
-        Settings.SetMetaQuestsEnabled(self:GetChecked())
-    end)
-
-    local metaLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    metaLabel:SetPoint("LEFT", metaCheckbox, "RIGHT", 8, 0)
-    metaLabel:SetText(L.META_QUESTS)
-    metaLabel:SetTextColor(1, 1, 1)
+    local filtersAnchor = createOptionsSection(frame, L.FILTERS_TITLE, flowsAnchor, -20, {
+        {name = "AutoQuestsNormalUnfinishedCheckbox", getter = Settings.IsNormalQuestsUnfinishedEnabled, setter = Settings.SetNormalQuestsUnfinishedEnabled, label = L.NORMAL_UNFINISHED},
+        {name = "AutoQuestsNormalFinishedCheckbox", getter = Settings.IsNormalQuestsFinishedEnabled, setter = Settings.SetNormalQuestsFinishedEnabled, label = L.NORMAL_FINISHED},
+        {name = "AutoQuestsCampaignUnfinishedCheckbox", getter = Settings.IsCampaignQuestsUnfinishedEnabled, setter = Settings.SetCampaignQuestsUnfinishedEnabled, label = L.CAMPAIGN_UNFINISHED},
+        {name = "AutoQuestsCampaignFinishedCheckbox", getter = Settings.IsCampaignQuestsFinishedEnabled, setter = Settings.SetCampaignQuestsFinishedEnabled, label = L.CAMPAIGN_FINISHED},
+        {name = "AutoQuestsRepeatableCheckbox", getter = Settings.IsRepeatableQuestsEnabled, setter = Settings.SetRepeatableQuestsEnabled, label = L.REPEATABLE_QUESTS},
+        {name = "AutoQuestsBountyCheckbox", getter = Settings.IsBountyQuestsEnabled, setter = Settings.SetBountyQuestsEnabled, label = L.BOUNTY_QUESTS},
+        {name = "AutoQuestsWorldCheckbox", getter = Settings.IsWorldQuestsEnabled, setter = Settings.SetWorldQuestsEnabled, label = L.WORLD_QUESTS},
+        {name = "AutoQuestsMetaCheckbox", getter = Settings.IsMetaQuestsEnabled, setter = Settings.SetMetaQuestsEnabled, label = L.META_QUESTS},
+    })
 
     -- MISC SECTION
-    local miscTitle = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalMed1")
-    miscTitle:SetPoint("TOPLEFT", metaCheckbox, "BOTTOMLEFT", 0, -20)
-    miscTitle:SetText(L.MISC_TITLE)
-    miscTitle:SetTextColor(1, 0.82, 0)  -- Golden yellow like headers
-
-    -- Divider line after misc title
-    local miscDivider = frame:CreateLine()
-    miscDivider:SetColorTexture(0.5, 0.5, 0.5, 0.5)
-    miscDivider:SetThickness(1)
-    miscDivider:SetStartPoint("LEFT", miscTitle, "BOTTOMLEFT", 0, -4)
-    miscDivider:SetEndPoint("RIGHT", miscTitle, "BOTTOMRIGHT", -16, -4)
-
-    -- Debug Checkbox
-    local debugCheckbox = CreateFrame("CheckButton", "AutoQuestsDebugCheckbox", frame, "UICheckButtonTemplate")
-    debugCheckbox:SetPoint("TOPLEFT", miscDivider, "BOTTOMLEFT", 0, -6)
-    debugCheckbox:SetChecked(Settings.IsDebugEnabled())
-    debugCheckbox:SetScript("OnClick", function(self)
-        Settings.SetDebugEnabled(self:GetChecked())
-    end)
-
-    local debugLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    debugLabel:SetPoint("LEFT", debugCheckbox, "RIGHT", 8, 0)
-    debugLabel:SetText(L.DEBUG)
-    debugLabel:SetTextColor(1, 1, 1)
+    createOptionsSection(frame, L.MISC_TITLE, filtersAnchor, -20, {
+        {name = "AutoQuestsDebugCheckbox", getter = Settings.IsDebugEnabled, setter = Settings.SetDebugEnabled, label = L.DEBUG},
+    })
 
     -- Register with Blizzard Settings
     print("[AutoQuests] Registering with Blizzard Settings API")

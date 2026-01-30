@@ -102,6 +102,7 @@ function OptionsPanel.CreatePanel()
         {name = "AutoQuestsWorldCheckbox", getter = Settings.IsWorldQuestsEnabled, setter = Settings.SetWorldQuestsEnabled, label = L.WORLD_QUESTS},
         {name = "AutoQuestsMetaCheckbox", getter = Settings.IsMetaQuestsEnabled, setter = Settings.SetMetaQuestsEnabled, label = L.META_QUESTS},
         {name = "AutoQuestsProfessionCheckbox", getter = Settings.IsProfessionQuestsEnabled, setter = Settings.SetProfessionQuestsEnabled, label = L.PROFESSION_QUESTS},
+        {name = "AutoQuestsPvpCheckbox", getter = Settings.IsPvpQuestsEnabled, setter = Settings.SetPvpQuestsEnabled, label = L.PVP_QUESTS},
     })
 
     -- MISC SECTION

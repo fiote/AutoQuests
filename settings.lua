@@ -26,6 +26,7 @@ local DEFAULTS = {
         worldQuests = false,
         metaQuests = false,
         professionQuests = false,
+        pvpQuests = false,
     },
     misc = {
         debug = false,
@@ -191,6 +192,14 @@ function Settings.SetProfessionQuestsEnabled(value)
     AutoQuestsDB.filters.professionQuests = value
 end
 
+function Settings.IsPvpQuestsEnabled()
+    return AutoQuestsDB.filters.pvpQuests
+end
+
+function Settings.SetPvpQuestsEnabled(value)
+    AutoQuestsDB.filters.pvpQuests = value
+end
+
 -- Misc getters and setters
 function Settings.IsDebugEnabled()
     if AutoQuestsDB == nil or AutoQuestsDB.misc == nil then
@@ -248,6 +257,8 @@ function Settings.MatchesFilters(questId)
         questTypes.invasion = true
     elseif questType == 267 then
         questTypes.profession = true
+    elseif questType == 41 then
+        questTypes.pvp = true
     elseif isImportant then
         questTypes.campaign = true
     elseif isWorld then
@@ -303,6 +314,9 @@ function Settings.MatchesFilters(questId)
     if questTypes.profession and not Settings.IsProfessionQuestsEnabled() then
         return false
     end
+    if questTypes.pvp and not Settings.IsPvpQuestsEnabled() then
+        return false
+    end
 
     return true
 end
@@ -310,7 +324,9 @@ end
 --[[
     Gets the category name of a quest for debugging purposes
 ]]
-function Settings.GetQuestCategory(questId)
+function Settings.GetQuestCategory(quest)
+		local questId = quest.questID
+
     if questId == nil then
         return "Unknown"
     end
@@ -325,7 +341,9 @@ function Settings.GetQuestCategory(questId)
         return "Invasion Quest"
     elseif C_QuestLog.GetQuestType(questId) == 267 then
         return "Profession Quest"
-    elseif C_QuestLog.IsImportantQuest(questId) then
+    elseif C_QuestLog.GetQuestType(questId) == 41 then
+        return "PVP Quest"
+    elseif C_QuestLog.IsImportantQuest(questId) or quest.isLegendary then
         if C_QuestLog.IsQuestFlaggedCompletedOnAccount(questId) then
             return "Campaign (Warband Completed)"
         else
@@ -335,7 +353,7 @@ function Settings.GetQuestCategory(questId)
         return "World Quest"
     elseif C_QuestLog.IsMetaQuest(questId) then
         return "Meta Quest"
-    elseif C_QuestLog.IsRepeatableQuest(questId) then
+    elseif C_QuestLog.IsRepeatableQuest(questId) or quest.repeatable then
         return "Repeatable"
     else
         if C_QuestLog.IsQuestFlaggedCompletedOnAccount(questId) then
@@ -346,28 +364,56 @@ function Settings.GetQuestCategory(questId)
     end
 end
 
-function Settings.OutputAllFlags(questId)
+function Settings.OutputAllFlags(quest)
 		if not Settings.IsDebugEnabled() then
 			return
 		end
-		print("Quest ID:", questId, "Quest Name:", C_QuestLog.GetTitleForQuestID(questId, "Quest Category", Settings.GetQuestCategory(questId)))
-		print("IsQuestBounty:", C_QuestLog.IsQuestBounty(questId))
-		print("IsQuestCalling:", C_QuestLog.IsQuestCalling(questId))
-		-- print("IsQuestCriteriaForBounty:", C_QuestLog.IsQuestCriteriaForBounty(questId))
-		print("IsRepeatableQuest:", C_QuestLog.IsRepeatableQuest(questId))
-		print("IsMetaQuest:", C_QuestLog.IsMetaQuest(questId))
-		print("IsQuestDisabledForSession:", C_QuestLog.IsQuestDisabledForSession(questId))
-		print("IsQuestFlaggedCompleted:", C_QuestLog.IsQuestFlaggedCompleted(questId))
-		print("IsQuestFlaggedCompletedOnAccount:", C_QuestLog.IsQuestFlaggedCompletedOnAccount(questId))
-		print("IsQuestFromContentPush:", C_QuestLog.IsQuestFromContentPush(questId))
-		print("IsQuestInvasion:", C_QuestLog.IsQuestInvasion(questId))
-		print("IsQuestReplayable:", C_QuestLog.IsQuestReplayable(questId))
-		print("IsQuestReplayedRecently:", C_QuestLog.IsQuestReplayedRecently(questId))
-		print("IsImportantQuest:", C_QuestLog.IsImportantQuest(questId))
-		print("IsWorldQuest:", C_QuestLog.IsWorldQuest(questId))
-		print("IsQuestTask:", C_QuestLog.IsQuestTask(questId))
-		print("IsQuestTrivial:", C_QuestLog.IsQuestTrivial(questId))
-		print("questType:", C_QuestLog.GetQuestType(questId))
+		print("===== OUTPUT ALL FLAGS =====")
+		if not quest or not quest.questID then
+			print("No quest or quest ID")
+			return
+		end
+		print("Quest ID:", quest.questID, "Quest Name:", C_QuestLog.GetTitleForQuestID(quest.questID, "Quest Category", Settings.GetQuestCategory(quest)))
+		print("IsAccountQuest:", C_QuestLog.IsAccountQuest(quest.questID))
+		print("IsComplete:", C_QuestLog.IsComplete(quest.questID))
+		print("IsFailed:", C_QuestLog.IsFailed(quest.questID))
+		print("IsImportantQuest:", C_QuestLog.IsImportantQuest(quest.questID))
+		print("IsMetaQuest:", C_QuestLog.IsMetaQuest(quest.questID))
+		print("IsOnMap:", C_QuestLog.IsOnMap(quest.questID))
+		print("IsOnQuest:", C_QuestLog.IsOnQuest(quest.questID))
+		print("IsPushableQuest:", C_QuestLog.IsPushableQuest(quest.questID))
+		print("IsQuestBounty:", C_QuestLog.IsQuestBounty(quest.questID))
+		print("IsQuestCalling:", C_QuestLog.IsQuestCalling(quest.questID))
+		-- print("IsQuestCriteriaForBounty:", C_QuestLog.IsQuestCriteriaForBounty(quest.questID))
+		print("IsQuestDisabledForSession:", C_QuestLog.IsQuestDisabledForSession(quest.questID))
+		print("IsQuestFlaggedCompleted:", C_QuestLog.IsQuestFlaggedCompleted(quest.questID))
+		print("IsQuestFlaggedCompletedOnAccount:", C_QuestLog.IsQuestFlaggedCompletedOnAccount(quest.questID))
+		print("IsQuestFromContentPush:", C_QuestLog.IsQuestFromContentPush(quest.questID))
+		print("IsQuestInvasion:", C_QuestLog.IsQuestInvasion(quest.questID))
+		print("IsQuestReplayable:", C_QuestLog.IsQuestReplayable(quest.questID))
+		print("IsQuestReplayedRecently:", C_QuestLog.IsQuestReplayedRecently(quest.questID))
+		print("IsQuestTask:", C_QuestLog.IsQuestTask(quest.questID))
+		print("IsQuestTrivial:", C_QuestLog.IsQuestTrivial(quest.questID))
+		print("IsRepeatableQuest:", C_QuestLog.IsRepeatableQuest(quest.questID))
+		print("IsThreatQuest:", C_QuestLog.IsThreatQuest(quest.questID))
+		-- print("IsUnitOnQuest:", C_QuestLog.IsUnitOnQuest(quest.questID))
+		print("IsWorldQuest:", C_QuestLog.IsWorldQuest(quest.questID))
+		print("QuestHasWarModeBonus:", C_QuestLog.QuestHasWarModeBonus(quest.questID))
+		print("---")
+		local info = C_QuestLog.GetQuestTagInfo(quest.questID)
+		print("info.tagName:", info and info.tagName or "nil")
+		print("info.tagID:", info and info.tagID or "nil")
+		print("info.worldQuestType:", info and info.worldQuestType or "nil")
+		print("info.quality:", info and info.quality or "nil")
+		print("info.tradeskillLineID:", info and info.tradeskillLineID or "nil")
+		print("info.isElite:", info and info.isElite or "nil")
+		print("info.displayExpiration:", info and info.displayExpiration or "nil")
+		print("---")
+		print("quest.isLegendary:", quest.isLegendary)
+		print("quest.frequency:", quest.frequency)
+		print("quest.repeatable:", quest.repeatable)
+		print("---")
+		print("questType:", C_QuestLog.GetQuestType(quest.questID))
 end
 
 --[[

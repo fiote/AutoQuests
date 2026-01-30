@@ -30,7 +30,7 @@ function ShouldProcessQuest(quest, flowEnabled, disabledReason, filterCheckFn)
         return false
     end
 
-    if filterCheckFn and not filterCheckFn(quest.id) then
+    if filterCheckFn and not filterCheckFn(quest) then
         if Settings.IsDebugEnabled() then
             printMessage("[AutoQuests] Quest '" .. quest.title .. "' detected as " .. category .. ", but filters don't match.")
         end
@@ -83,19 +83,19 @@ function HandleAcceptQuest()
     -- First priority: use lastSelectedQuest if set (from gossip selection)
     if lastSelectedQuest and lastSelectedQuest ~= nil then
         quest = lastSelectedQuest
-        printMessage("[AutoQuests] HandleAcceptQuest: Using lastSelectedQuest from gossip: " .. tostring(quest.id))
+        printMessage("[AutoQuests] HandleAcceptQuest: Using lastSelectedQuest from gossip: " .. tostring(quest.questID))
     else
         -- Fallback: try GetQuestID() which works during QUEST_DETAIL
         quest = GetQuestInfo()
-        printMessage("[AutoQuests] HandleAcceptQuest: Using GetQuestID(): " .. tostring(quest.id))
+        printMessage("[AutoQuests] HandleAcceptQuest: Using GetQuestID(): " .. tostring(quest.questID))
     end
 
-    if not quest or not quest.id or quest.id == 0 then
+    if not quest or not quest.questID or quest.questID == 0 then
         printMessage("[AutoQuests] HandleAcceptQuest: Could not determine questId")
         return
     end
 
-    printMessage("[AutoQuests] HandleAcceptQuest: Final questId: " .. tostring(quest.id))
+    printMessage("[AutoQuests] HandleAcceptQuest: Final questId: " .. tostring(quest.questID))
 
     if not quest then
         printMessage("[AutoQuests] HandleAcceptQuest: Could not get quest info")
@@ -105,7 +105,7 @@ function HandleAcceptQuest()
 		local category = Settings.GetQuestCategory(quest)
 
     printMessage("[AutoQuests] HandleAcceptQuest: Got quest info - Title: '" .. quest.title .. "' (" .. category .. ")")
-		-- Settings.Output	lags(quest.id)
+		-- Settings.Output	lags(quest.questID)
 
     if not ShouldProcessQuest(quest, Settings.IsAutoAcceptEnabled(), "auto-accept flow is disabled", Settings.MatchesFilters) then
         return
@@ -135,10 +135,10 @@ function OnQuestProgress()
     else
         -- Fallback: try GetQuestID() which works during QUEST_PROGRESS
         quest = GetQuestInfo()
-        printMessage("[AutoQuests] OnQuestProgress: Using GetQuestID(): " .. tostring(quest.id))
+        printMessage("[AutoQuests] OnQuestProgress: Using GetQuestID(): " .. tostring(quest.questID))
     end
 
-    if not quest or not quest.id or quest.id == 0 then
+    if not quest or not quest.questID or quest.questID == 0 then
         printMessage("[AutoQuests] OnQuestProgress: Could not determine questId")
         return
     end
@@ -182,7 +182,7 @@ function HandleQuestAutocomplete(quest)
     end
 
     LogQuestProcessing(quest, "auto-completing")
-    ShowQuestComplete(C_QuestLog.GetLogIndexForQuestID(quest.id))
+    ShowQuestComplete(C_QuestLog.GetLogIndexForQuestID(quest.questID))
 end
 
 --[[
@@ -203,7 +203,7 @@ function HandleGossipShow()
             printMessage("[AutoQuests] Available quests in gossip:")
             for i, quest in ipairs(availableQuests) do
                 local category = Settings.GetQuestCategory(quest)
-                local matches = Settings.MatchesFilters(quest.questID)
+                local matches = Settings.MatchesFilters(quest)
                 local matchStr = matches and "MATCHES" or "NO MATCH"
                 printMessage("[AutoQuests] - " .. quest.title .. " (" .. category .. ") " .. matchStr)
             end
@@ -251,7 +251,7 @@ function HandleGossipShow()
 			 if Settings.IsAutoAcceptEnabled() then
 					-- Auto-accept is enabled: select quests that match filters
 					for i, quest in ipairs(availableQuests) do
-							if Settings.MatchesFilters(quest.questID) then
+							if Settings.MatchesFilters(quest) then
 									local category = Settings.GetQuestCategory(quest)
 									if Settings.IsDebugEnabled() then
 											printMessage("[AutoQuests] Quest '" .. quest.title .. "' detected as " .. category .. ", auto-accepting...")
@@ -274,7 +274,7 @@ function HandleGossipShow()
 					printMessage("[AutoQuests] Gossip has " .. nActive .. " active quests, auto-complete enabled")
 					for i, quest in ipairs(activeQuests) do
 							local isComplete = quest.isComplete
-							local matchesFilters = Settings.MatchesFilters(quest.questID)
+							local matchesFilters = Settings.MatchesFilters(quest)
 							local category = Settings.GetQuestCategory(quest)
 
 							-- Settings.OutputAllFlags(quest)

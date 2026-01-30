@@ -217,108 +217,44 @@ end
 
 --[[
     Determines if a quest matches the enabled filters.
-    Returns true only if ALL applicable quest types are enabled.
-
-    Quest types checked:
-    - Bounty: C_QuestLog.IsQuestBounty
-    - Normal: not important, repeatable, world, or meta
-    - Campaign: C_QuestLog.IsImportantQuest
-    - Repeatable: C_QuestLog.IsRepeatableQuest
-    - World: C_QuestLog.IsWorldQuest
-    - Meta: C_QuestLog.IsMetaQuest
-    - Finished on warband: C_QuestLog.IsQuestFlaggedCompletedOnAccount
+    Uses GetQuestCategory to determine the quest type, then checks if that type is enabled.
 ]]
-function Settings.MatchesFilters(questId)
-    if questId == nil then
+function Settings.MatchesFilters(quest)
+    if quest == nil or quest.questID == nil then
         return false
     end
 
-    local isBounty = C_QuestLog.IsQuestBounty(questId)
-    local isTask = C_QuestLog.IsQuestTask(questId)
-    local isTrivial = C_QuestLog.IsQuestTrivial(questId)
-    local isInvasion = C_QuestLog.IsQuestInvasion(questId)
-    local isImportant = C_QuestLog.IsImportantQuest(questId)
-    local isRepeatable = C_QuestLog.IsRepeatableQuest(questId)
-    local isWorld = C_QuestLog.IsWorldQuest(questId)
-    local isMeta = C_QuestLog.IsMetaQuest(questId)
-    local isFinishedOnAccount = C_QuestLog.IsQuestFlaggedCompletedOnAccount(questId)
+    local category = Settings.GetQuestCategory(quest)
 
-    -- Determine quest types
-    local questTypes = {}
-    local questType = C_QuestLog.GetQuestType(questId)
-
-    if isBounty then
-        questTypes.bounty = true
-    elseif isTask then
-        questTypes.task = true
-    elseif isTrivial then
-        questTypes.trivial = true
-    elseif isInvasion then
-        questTypes.invasion = true
-    elseif questType == 267 then
-        questTypes.profession = true
-    elseif questType == 41 then
-        questTypes.pvp = true
-    elseif isImportant then
-        questTypes.campaign = true
-    elseif isWorld then
-        questTypes.world = true
-    elseif isMeta then
-        questTypes.meta = true
-    elseif isRepeatable then
-        questTypes.repeatable = true
+    if category == "Bounty Quest" then
+        return Settings.IsBountyQuestsEnabled()
+    elseif category == "Task Quest" then
+        return Settings.IsTaskQuestsEnabled()
+    elseif category == "Trivial Quest" then
+        return Settings.IsTrivialQuestsEnabled()
+    elseif category == "Invasion Quest" then
+        return Settings.IsInvasionQuestsEnabled()
+    elseif category == "Profession Quest" then
+        return Settings.IsProfessionQuestsEnabled()
+    elseif category == "PVP Quest" then
+        return Settings.IsPvpQuestsEnabled()
+    elseif category == "Campaign (Warband Completed)" then
+        return Settings.IsCampaignQuestsFinishedEnabled()
+    elseif category == "Campaign" then
+        return Settings.IsCampaignQuestsUnfinishedEnabled()
+    elseif category == "World Quest" then
+        return Settings.IsWorldQuestsEnabled()
+    elseif category == "Meta Quest" then
+        return Settings.IsMetaQuestsEnabled()
+    elseif category == "Repeatable" then
+        return Settings.IsRepeatableQuestsEnabled()
+    elseif category == "Normal (Warband Completed)" then
+        return Settings.IsNormalQuestsFinishedEnabled()
+    elseif category == "Normal" then
+        return Settings.IsNormalQuestsUnfinishedEnabled()
     else
-        -- Normal quest
-        if isFinishedOnAccount then
-            questTypes.normalFinished = true
-        else
-            questTypes.normalUnfinished = true
-        end
-    end
-
-    -- Check if all applicable types are enabled
-    if questTypes.bounty and not Settings.IsBountyQuestsEnabled() then
         return false
     end
-    if questTypes.task and not Settings.IsTaskQuestsEnabled() then
-        return false
-    end
-    if questTypes.trivial and not Settings.IsTrivialQuestsEnabled() then
-        return false
-    end
-    if questTypes.invasion and not Settings.IsInvasionQuestsEnabled() then
-        return false
-    end
-    if questTypes.normalUnfinished and not Settings.IsNormalQuestsUnfinishedEnabled() then
-        return false
-    end
-    if questTypes.normalFinished and not Settings.IsNormalQuestsFinishedEnabled() then
-        return false
-    end
-    if questTypes.campaign then
-        if isFinishedOnAccount then
-            if not Settings.IsCampaignQuestsFinishedEnabled() then return false end
-        else
-            if not Settings.IsCampaignQuestsUnfinishedEnabled() then return false end
-        end
-    end
-    if questTypes.repeatable and not Settings.IsRepeatableQuestsEnabled() then
-        return false
-    end
-    if questTypes.world and not Settings.IsWorldQuestsEnabled() then
-        return false
-    end
-    if questTypes.meta and not Settings.IsMetaQuestsEnabled() then
-        return false
-    end
-    if questTypes.profession and not Settings.IsProfessionQuestsEnabled() then
-        return false
-    end
-    if questTypes.pvp and not Settings.IsPvpQuestsEnabled() then
-        return false
-    end
-
-    return true
 end
 
 --[[

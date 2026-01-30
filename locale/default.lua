@@ -28,6 +28,7 @@ L.CAMPAIGN_FINISHED = "Campaign Quests (Completed by Warband)"
 L.REPEATABLE_QUESTS = "Repeatable Quests"
 L.WORLD_QUESTS = "World Quests"
 L.META_QUESTS = "Meta Quests"
+L.PROFESSION_QUESTS = "Profession Quests"
 
 -- Misc
 L.MISC_TITLE = "Miscellaneous"

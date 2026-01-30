@@ -101,6 +101,7 @@ function OptionsPanel.CreatePanel()
         {name = "AutoQuestsInvasionCheckbox", getter = Settings.IsInvasionQuestsEnabled, setter = Settings.SetInvasionQuestsEnabled, label = L.INVASION_QUESTS},
         {name = "AutoQuestsWorldCheckbox", getter = Settings.IsWorldQuestsEnabled, setter = Settings.SetWorldQuestsEnabled, label = L.WORLD_QUESTS},
         {name = "AutoQuestsMetaCheckbox", getter = Settings.IsMetaQuestsEnabled, setter = Settings.SetMetaQuestsEnabled, label = L.META_QUESTS},
+        {name = "AutoQuestsProfessionCheckbox", getter = Settings.IsProfessionQuestsEnabled, setter = Settings.SetProfessionQuestsEnabled, label = L.PROFESSION_QUESTS},
     })
 
     -- MISC SECTION

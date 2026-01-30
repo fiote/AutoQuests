@@ -25,6 +25,7 @@ local DEFAULTS = {
         invasionQuests = false,
         worldQuests = false,
         metaQuests = false,
+        professionQuests = false,
     },
     misc = {
         debug = false,
@@ -182,6 +183,14 @@ function Settings.SetMetaQuestsEnabled(value)
     AutoQuestsDB.filters.metaQuests = value
 end
 
+function Settings.IsProfessionQuestsEnabled()
+    return AutoQuestsDB.filters.professionQuests
+end
+
+function Settings.SetProfessionQuestsEnabled(value)
+    AutoQuestsDB.filters.professionQuests = value
+end
+
 -- Misc getters and setters
 function Settings.IsDebugEnabled()
     if AutoQuestsDB == nil or AutoQuestsDB.misc == nil then
@@ -227,6 +236,7 @@ function Settings.MatchesFilters(questId)
 
     -- Determine quest types
     local questTypes = {}
+    local questType = C_QuestLog.GetQuestType(questId)
 
     if isBounty then
         questTypes.bounty = true
@@ -236,6 +246,8 @@ function Settings.MatchesFilters(questId)
         questTypes.trivial = true
     elseif isInvasion then
         questTypes.invasion = true
+    elseif questType == 267 then
+        questTypes.profession = true
     elseif isImportant then
         questTypes.campaign = true
     elseif isWorld then
@@ -288,6 +300,9 @@ function Settings.MatchesFilters(questId)
     if questTypes.meta and not Settings.IsMetaQuestsEnabled() then
         return false
     end
+    if questTypes.profession and not Settings.IsProfessionQuestsEnabled() then
+        return false
+    end
 
     return true
 end
@@ -308,6 +323,8 @@ function Settings.GetQuestCategory(questId)
         return "Trivial Quest"
     elseif C_QuestLog.IsQuestInvasion(questId) then
         return "Invasion Quest"
+    elseif C_QuestLog.GetQuestType(questId) == 267 then
+        return "Profession Quest"
     elseif C_QuestLog.IsImportantQuest(questId) then
         if C_QuestLog.IsQuestFlaggedCompletedOnAccount(questId) then
             return "Campaign (Warband Completed)"
@@ -337,6 +354,8 @@ function Settings.OutputAllFlags(questId)
 		print("IsQuestBounty:", C_QuestLog.IsQuestBounty(questId))
 		print("IsQuestCalling:", C_QuestLog.IsQuestCalling(questId))
 		-- print("IsQuestCriteriaForBounty:", C_QuestLog.IsQuestCriteriaForBounty(questId))
+		print("IsRepeatableQuest:", C_QuestLog.IsRepeatableQuest(questId))
+		print("IsMetaQuest:", C_QuestLog.IsMetaQuest(questId))
 		print("IsQuestDisabledForSession:", C_QuestLog.IsQuestDisabledForSession(questId))
 		print("IsQuestFlaggedCompleted:", C_QuestLog.IsQuestFlaggedCompleted(questId))
 		print("IsQuestFlaggedCompletedOnAccount:", C_QuestLog.IsQuestFlaggedCompletedOnAccount(questId))
@@ -344,8 +363,11 @@ function Settings.OutputAllFlags(questId)
 		print("IsQuestInvasion:", C_QuestLog.IsQuestInvasion(questId))
 		print("IsQuestReplayable:", C_QuestLog.IsQuestReplayable(questId))
 		print("IsQuestReplayedRecently:", C_QuestLog.IsQuestReplayedRecently(questId))
+		print("IsImportantQuest:", C_QuestLog.IsImportantQuest(questId))
+		print("IsWorldQuest:", C_QuestLog.IsWorldQuest(questId))
 		print("IsQuestTask:", C_QuestLog.IsQuestTask(questId))
 		print("IsQuestTrivial:", C_QuestLog.IsQuestTrivial(questId))
+		print("questType:", C_QuestLog.GetQuestType(questId))
 end
 
 --[[

@@ -404,7 +404,7 @@ function ON_QUEST_COMPLETE()
 
 			local category = Settings.GetQuestCategoryByID(questID, quest)
 			local title = C_QuestLog.GetTitleForQuestID(questID)
-			printMessage("[AutoQuests] Quest: '" .. title .. "' (" .. category .. "), Reward count: " .. rewardCount)
+			printMessage("[AutoQuests] Quest: '" .. (title or "Unknown") .. "' (" .. category .. "), Reward count: " .. rewardCount)
 
     if rewardCount > 1 then
         printMessage(L.TITLE .. L.MULTIPLE_REWARDS)

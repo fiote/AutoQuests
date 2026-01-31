@@ -226,7 +226,7 @@ function HandleGossipShow()
             printMessage("[AutoQuests] Available quests in gossip:")
             for i, quest in ipairs(availableQuests) do
                 local category = Settings.GetQuestCategory(quest)
-                local matches = Settings.MatchesFilters(quest)
+                local matches = Settings.MatchesFilters(quest.questID, quest)
                 local matchStr = matches and "MATCHES" or "NO MATCH"
                 printMessage("[AutoQuests] - " .. quest.title .. " (" .. category .. ") " .. matchStr)
             end
@@ -274,7 +274,7 @@ function HandleGossipShow()
 			 if Settings.IsAutoAcceptEnabled() then
 					-- Auto-accept is enabled: select quests that match filters
 					for i, quest in ipairs(availableQuests) do
-							if Settings.MatchesFilters(quest) then
+							if Settings.MatchesFilters(quest.questID, quest) then
 									local category = Settings.GetQuestCategory(quest)
 									if Settings.IsDebugEnabled() then
 											printMessage("[AutoQuests] Quest '" .. quest.title .. "' detected as " .. category .. ", auto-accepting...")
@@ -297,7 +297,7 @@ function HandleGossipShow()
 					printMessage("[AutoQuests] Gossip has " .. nActive .. " active quests, auto-complete enabled")
 					for i, quest in ipairs(activeQuests) do
 							local isComplete = quest.isComplete
-							local matchesFilters = Settings.MatchesFilters(quest)
+							local matchesFilters = Settings.MatchesFilters(quest.questID, quest)
 							local category = Settings.GetQuestCategory(quest)
 
 							-- Settings.OutputAllFlags(quest)

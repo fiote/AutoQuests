@@ -324,6 +324,7 @@ function Settings.OutputAllFlagsByQuestID(questID, quest)
 			category = Settings.GetQuestCategory(quest)
 		end
 		print("Quest ID:", questID, "Quest Name:", C_QuestLog.GetTitleForQuestID(questID), "Quest Category", category)
+
 		print("IsAccountQuest:", C_QuestLog.IsAccountQuest(questID))
 		print("IsComplete:", C_QuestLog.IsComplete(questID))
 		print("IsFailed:", C_QuestLog.IsFailed(questID))

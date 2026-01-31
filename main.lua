@@ -71,7 +71,7 @@ function AutoQuestsHandler(self, event, ...)
     elseif event == "QUEST_AUTOCOMPLETE" then
         HandleQuestAutocomplete(...)
     elseif event == "QUEST_COMPLETE" then
-        HandleQuestCompletion()
+        ON_QUEST_COMPLETE()
     end
 end
 
@@ -379,28 +379,38 @@ end
     Fonction pour gérer l'événement QUEST_COMPLETE
     Auto-picks reward if flow is enabled and there's only one reward
 ]]
-function HandleQuestCompletion()
+function ON_QUEST_COMPLETE()
     local quest = lastSelectedActiveQuest
+		local questID = nil
 
-		if not quest then
-				printMessage("[AutoQuests] HandleQuestCompletion: lastSelectedActiveQuest is nil, cant determine quest")
+		-- First priority: use lastSelectedActiveQuest if set (from gossip selection)
+		if lastSelectedActiveQuest and lastSelectedActiveQuest ~= nil then
+				quest = lastSelectedActiveQuest
+				questID = quest.questID
+				printMessage("[AutoQuests] ON_QUEST_COMPLETE: Using lastSelectedActiveQuest from gossip: " .. tostring(questID))
+		else
+				-- Fallback: try GetQuestID() which works during QUEST_COMPLETE
+				questID = GetQuestID()
+				printMessage("[AutoQuests] ON_QUEST_COMPLETE: Fallback GetQuestID() returned: " .. tostring(questID))
+		end
+
+		if not questID or questID == 0 then
+				printMessage("[AutoQuests] ON_QUEST_COMPLETE: Could not determine questId")
 				return
 		end
 
     local rewardCount = GetNumQuestChoices()
-    printMessage("[AutoQuests] HandleQuestCompletion called for questId: " .. tostring(quest.questID) .. ", rewardCount: " .. rewardCount)
-    if quest then
-				local category = Settings.GetQuestCategory(quest)
-        printMessage("[AutoQuests] Quest: '" .. quest.title .. "' (" .. category .. "), Reward count: " .. rewardCount)
-    else
-        printMessage("[AutoQuests] Could not get quest info")
-    end
+    printMessage("[AutoQuests] ON_QUEST_COMPLETE called for questId: " .. tostring(questID) .. ", rewardCount: " .. rewardCount)
+
+			local category = Settings.GetQuestCategoryByID(questID, quest)
+			local title = C_QuestLog.GetTitleForQuestID(questID)
+			printMessage("[AutoQuests] Quest: '" .. title .. "' (" .. category .. "), Reward count: " .. rewardCount)
 
     if rewardCount > 1 then
         printMessage(L.TITLE .. L.MULTIPLE_REWARDS)
         PlaySound(5274, "master")
     elseif (rewardCount == 0 or rewardCount == 1) and Settings.IsAutoCompleteEnabled() then
-        printMessage("[AutoQuests] Auto-selecting reward for '" .. (quest and quest.title or "Unknown") .. "'")
+        printMessage("[AutoQuests] Auto-selecting reward for '" .. (title or "Unknown") .. "'")
         printMessage("[AutoQuests] Calling GetQuestReward(" .. defaultRewardIndex .. ")")
         GetQuestReward(defaultRewardIndex)
     else

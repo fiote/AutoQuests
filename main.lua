@@ -127,7 +127,7 @@ function ON_QUEST_DETAIL(questparam)
 		local category = Settings.GetQuestCategoryByID(questID, quest)
 		local title = C_QuestLog.GetTitleForQuestID(questID)
 
-    printMessage("[AutoQuests] ON_QUEST_DETAIL: Got quest info - Title: '" .. title .. "' (" .. category .. ")")
+    printMessage("[AutoQuests] ON_QUEST_DETAIL: Got quest info - Title: '" .. tostring(title) .. "' (" .. category .. ")")
 		-- Settings.Output	lags(quest.questID)
 
     if not ShouldProcessQuest(questID, quest, Settings.IsAutoAcceptEnabled(), "auto-accept flow is disabled", Settings.MatchesFilters) then

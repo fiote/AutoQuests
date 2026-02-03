@@ -6,6 +6,9 @@ local AddonName, L = ...
 
 local Settings = {}
 
+-- Cache for quest categories by questID
+local CATEGORY_CACHE = {}
+
 -- Default settings for new characters
 local DEFAULTS = {
     flows = {
@@ -219,12 +222,13 @@ end
     Determines if a quest matches the enabled filters.
     Uses GetQuestCategory to determine the quest type, then checks if that type is enabled.
 ]]
-function Settings.MatchesFilters(questId, quest)
+
+function Settings.MatchesFilters(questId, quest, availableIndex)
     if questId == nil then
         return false
     end
 
-    local category = Settings.GetQuestCategoryByID(questId, quest)
+    local category = Settings.GetCategoryByParams(questId, quest, availableIndex)
 
     if category == "Bounty Quest" then
         return Settings.IsBountyQuestsEnabled()
@@ -260,13 +264,18 @@ end
 --[[
     Gets the category name of a quest for debugging purposes
 ]]
-function Settings.GetQuestCategory(quest)
-		return Settings.GetQuestCategoryByID(quest.questID, quest)
+function Settings.GetCategoryByQuest(quest)
+		return Settings.GetCategoryByParams(quest.questID, quest)
 end
 
-function Settings.GetQuestCategoryByID(questID, quest)
+function Settings.GetCategoryByParams(questID, quest, availableIndex)
 		if not questID or questID == 0 then
 				return "Unknown"
+		end
+
+		-- Check cache first
+		if CATEGORY_CACHE[questID] then
+				return CATEGORY_CACHE[questID]
 		end
 
 		local isLegendary = false
@@ -277,51 +286,89 @@ function Settings.GetQuestCategoryByID(questID, quest)
 			isRepeatable = quest.repeatable
 		end
 
+		if availableIndex and availableIndex > 0 then
+			local isTrivial, frequency, repeatable, legendary = GetAvailableQuestInfo(availableIndex)
+			isLegendary = isLegendary or legendary
+			isRepeatable = isRepeatable or repeatable
+		end
+
+		local category
     if C_QuestLog.IsQuestBounty(questID) then
-        return "Bounty Quest"
+        category = "Bounty Quest"
     elseif C_QuestLog.IsQuestTask(questID) then
-        return "Task Quest"
+        category = "Task Quest"
     elseif C_QuestLog.IsQuestTrivial(questID) then
-        return "Trivial Quest"
+        category = "Trivial Quest"
     elseif C_QuestLog.IsQuestInvasion(questID) then
-        return "Invasion Quest"
+        category = "Invasion Quest"
     elseif C_QuestLog.GetQuestType(questID) == 267 then
-        return "Profession Quest"
+        category = "Profession Quest"
     elseif C_QuestLog.GetQuestType(questID) == 41 then
-        return "PVP Quest"
+        category = "PVP Quest"
     elseif C_QuestLog.IsImportantQuest(questID) or isLegendary then
         if C_QuestLog.IsQuestFlaggedCompletedOnAccount(questId) then
-            return "Campaign (Warband Completed)"
+            category = "Campaign (Warband Completed)"
         else
-            return "Campaign"
+            category = "Campaign"
         end
     elseif C_QuestLog.IsWorldQuest(questID) then
-        return "World Quest"
+        category = "World Quest"
     elseif C_QuestLog.IsMetaQuest(questID) then
-        return "Meta Quest"
+        category = "Meta Quest"
     elseif C_QuestLog.IsRepeatableQuest(questID) or isRepeatable then
-        return "Repeatable"
+        category = "Repeatable"
     else
         if C_QuestLog.IsQuestFlaggedCompletedOnAccount(questID) then
-            return "Normal (Warband Completed)"
+            category = "Normal (Warband Completed)"
         else
-            return "Normal"
+            category = "Normal"
         end
     end
+
+		-- Cache non-normal categories
+		if category ~= "Normal" and category ~= "Normal (Warband Completed)" then
+				CATEGORY_CACHE[questID] = category
+		end
+
+		return category
+end
+
+function Settings.OutputAllFlagsByAvailableIndex(index)
+	if not Settings.IsDebugEnabled() then
+			return
+	end
+
+	print("===== OUTPUT ALL AVAILABLE FLAGS =====")
+	if not index or index == 0 then
+			print("No available quest index")
+			return
+	end
+
+	local title = GetAvailableTitle(index)
+	local isTrivial, frequency, isRepeatable, isLegendary, questID, isImportant = GetAvailableQuestInfo(index)
+
+	print("Quest ID:", questID, "Quest Name:", title, "Quest Category", Settings.GetCategoryByParams(questID))
+
+	print("isTrivial:", isTrivial)
+	print("frequency:", frequency)
+	print("isRepeatable:", isRepeatable)
+	print("isLegendary:", isLegendary)
+	print("isImportant:", isImportant)
 end
 
 function Settings.OutputAllFlagsByQuestID(questID, quest)
 		if not Settings.IsDebugEnabled() then
 			return
 		end
-		print("===== OUTPUT ALL FLAGS =====")
+
+		print("===== OUTPUT ALL QUEST FLAGS =====")
 		if not questID or questID == 0 then
 			print("No quest ID")
 			return
 		end
 		local category = 'N/A'
 		if quest then
-			category = Settings.GetQuestCategory(quest)
+			category = Settings.GetCategoryByQuest(quest)
 		end
 		print("Quest ID:", questID, "Quest Name:", C_QuestLog.GetTitleForQuestID(questID), "Quest Category", category)
 
@@ -359,7 +406,7 @@ function Settings.OutputAllFlagsByQuestID(questID, quest)
 		print("info.tradeskillLineID:", info and info.tradeskillLineID or "nil")
 		print("info.isElite:", info and info.isElite or "nil")
 		print("info.displayExpiration:", info and info.displayExpiration or "nil")
-		if quest == nil then
+		if quest ~= nil then
 			print("---")
 			print("quest.isLegendary:", quest.isLegendary)
 			print("quest.frequency:", quest.frequency)

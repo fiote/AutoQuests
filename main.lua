@@ -38,7 +38,7 @@ function ShouldProcessQuest(questId, quest, flowEnabled, disabledReason, filterC
     end
 
     if filterCheckFn and not filterCheckFn(questId, quest) then
-        DebugMessage("[AutoQuests] Quest '" .. title .. "' detected as " .. category .. ", but filters don't match.")
+        DebugMessage("[AutoQuests] Quest '" .. tostring(title or "Unknown") .. "' detected as " .. tostring(category or "Unknown") .. ", but filters don't match.")
         return false
     end
 
@@ -133,6 +133,7 @@ function ON_QUEST_DETAIL(questparam)
 		-- Settings.Output	lags(quest.questID)
 
     if not ShouldProcessQuest(questID, quest, Settings.IsAutoAcceptEnabled(), "auto-accept flow is disabled", Settings.MatchesFilters) then
+				Settings.OutputAllFlagsByQuestID(questID)
         return
     end
 

@@ -30,6 +30,7 @@ local DEFAULTS = {
         metaQuests = false,
         professionQuests = false,
         pvpQuests = false,
+        dungeonQuests = false,
     },
     misc = {
         debug = false,
@@ -203,6 +204,14 @@ function Settings.SetPvpQuestsEnabled(value)
     AutoQuestsDB.filters.pvpQuests = value
 end
 
+function Settings.IsDungeonQuestsEnabled()
+    return AutoQuestsDB.filters.dungeonQuests
+end
+
+function Settings.SetDungeonQuestsEnabled(value)
+    AutoQuestsDB.filters.dungeonQuests = value
+end
+
 -- Misc getters and setters
 function Settings.IsDebugEnabled()
     if AutoQuestsDB == nil or AutoQuestsDB.misc == nil then
@@ -242,6 +251,8 @@ function Settings.MatchesFilters(questId, quest, availableIndex)
         return Settings.IsProfessionQuestsEnabled()
     elseif category == "PVP Quest" then
         return Settings.IsPvpQuestsEnabled()
+    elseif category == "Dungeon Quest" then
+        return Settings.IsDungeonQuestsEnabled()
     elseif category == "Campaign (Warband Completed)" then
         return Settings.IsCampaignQuestsFinishedEnabled()
     elseif category == "Campaign" then
@@ -305,6 +316,8 @@ function Settings.GetCategoryByParams(questID, quest, availableIndex)
         category = "Profession Quest"
     elseif C_QuestLog.GetQuestType(questID) == 41 then
         category = "PVP Quest"
+    elseif C_QuestLog.GetQuestType(questID) == 81 then
+        category = "Dungeon Quest"
     elseif C_QuestLog.IsImportantQuest(questID) or isLegendary then
         if C_QuestLog.IsQuestFlaggedCompletedOnAccount(questId) then
             category = "Campaign (Warband Completed)"

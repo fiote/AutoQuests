@@ -14,9 +14,7 @@ function OptionsPanel.CreatePanel()
 
     -- Title label
     local titleLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    titleLabel:SetPoint("TOPLEFT", frame, "TOPLEFT", 16, -16)
-    titleLabel:SetText(L.OPTIONS_PANEL_NAME or "AutoQuests")
-    titleLabel:SetTextColor(1, 1, 1)
+    titleLabel:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 0)
 
     -- Helper function to create a checkbox with label
     local function createCheckboxOption(parent, name, anchor, anchorPoint, getter, setter, labelText, offset)
@@ -74,7 +72,7 @@ function OptionsPanel.CreatePanel()
 								offset
             )
             if lastCheckbox == divider then
-                lastCheckbox:SetPoint("TOPLEFT", divider, "BOTTOMLEFT", 0, -20)
+                lastCheckbox:SetPoint("TOPLEFT", divider, "BOTTOMLEFT", 0, -5)
             end
         end
 
@@ -82,14 +80,14 @@ function OptionsPanel.CreatePanel()
     end
 
     -- FLOWS SECTION
-    local flowsAnchor = createOptionsSection(frame, L.FLOWS_TITLE, titleLabel, -20, {
+    local flowsAnchor = createOptionsSection(frame, L.FLOWS_TITLE, titleLabel, -5, {
         {name = "AutoQuestsAutoAcceptCheckbox", getter = Settings.IsAutoAcceptEnabled, setter = Settings.SetAutoAcceptEnabled, label = L.AUTO_ACCEPT},
         {name = "AutoQuestsAutoCompleteCheckbox", getter = Settings.IsAutoCompleteEnabled, setter = Settings.SetAutoCompleteEnabled, label = L.AUTO_TURN_IN},
         {name = "AutoQuestsAutoSelectGossipsCheckbox", getter = Settings.IsAutoSelectGossipsEnabled, setter = Settings.SetAutoSelectGossipsEnabled, label = L.AUTO_SELECT_GOSSIPS},
     })
 
     -- FILTERS SECTION
-    local filtersAnchor = createOptionsSection(frame, L.FILTERS_TITLE, flowsAnchor, -20, {
+    local filtersAnchor = createOptionsSection(frame, L.FILTERS_TITLE, flowsAnchor, -5, {
         {name = "AutoQuestsNormalUnfinishedCheckbox", getter = Settings.IsNormalQuestsUnfinishedEnabled, setter = Settings.SetNormalQuestsUnfinishedEnabled, label = L.NORMAL_UNFINISHED},
         {name = "AutoQuestsNormalFinishedCheckbox", getter = Settings.IsNormalQuestsFinishedEnabled, setter = Settings.SetNormalQuestsFinishedEnabled, label = L.NORMAL_FINISHED},
         {name = "AutoQuestsCampaignUnfinishedCheckbox", getter = Settings.IsCampaignQuestsUnfinishedEnabled, setter = Settings.SetCampaignQuestsUnfinishedEnabled, label = L.CAMPAIGN_UNFINISHED},
@@ -103,6 +101,7 @@ function OptionsPanel.CreatePanel()
         {name = "AutoQuestsMetaCheckbox", getter = Settings.IsMetaQuestsEnabled, setter = Settings.SetMetaQuestsEnabled, label = L.META_QUESTS},
         {name = "AutoQuestsProfessionCheckbox", getter = Settings.IsProfessionQuestsEnabled, setter = Settings.SetProfessionQuestsEnabled, label = L.PROFESSION_QUESTS},
         {name = "AutoQuestsPvpCheckbox", getter = Settings.IsPvpQuestsEnabled, setter = Settings.SetPvpQuestsEnabled, label = L.PVP_QUESTS},
+        {name = "AutoQuestsDungeonCheckbox", getter = Settings.IsDungeonQuestsEnabled, setter = Settings.SetDungeonQuestsEnabled, label = L.DUNGEON_QUESTS},
     })
 
     -- MISC SECTION

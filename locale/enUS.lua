@@ -36,6 +36,7 @@ if GetLocale() == "enUS" then
   L.META_QUESTS = "Meta Quests"
   L.PROFESSION_QUESTS = "Profession Quests"
   L.PVP_QUESTS = "PVP Quests"
+  L.DUNGEON_QUESTS = "Dungeon Quests"
 
   -- Misc
   L.MISC_TITLE = "Miscellaneous"

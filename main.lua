@@ -242,27 +242,29 @@ function HandleGossipShow()
     -- Only automate gossip options if auto-select gossips is enabled
     if Settings.IsAutoSelectGossipsEnabled() then
         if #gossipOptions == 1 and gossipOptions[1].flags == 1 then
-            C_GossipInfo.SelectOption(gossipOptions[1].gossipOptionID)
+						DebugMessage("[AutoQuests] Only one gossip option and it's a quest, auto-selecting...")
+            -- C_GossipInfo.SelectOption(gossipOptions[1].gossipOptionID)
         else
+						DebugMessage("[AutoQuests] Multiple gossip options found, checking for quest options...")
             local questOptionsCount = 0
             local firstQuestOption = nil
-            for _, option in ipairs(gossipOptions) do
+						local firstQuestOptionIndex = nil
+            for index, option in ipairs(gossipOptions) do
                 if option.flags == 1 then
                     questOptionsCount = questOptionsCount + 1
                     if firstQuestOption == nil then
                         firstQuestOption = option
+												firstQuestOptionIndex = index
                     end
                 end
             end
-            if questOptionsCount > 1 then
-                DebugMessage(L.TITLE .. playerName .. L.GOSSIP)
-                PlaySound(5274, "master")
-                if firstQuestOption then
-                    C_GossipInfo.SelectOption(firstQuestOption.gossipOptionID)
-                end
-            elseif questOptionsCount == 1 then
-                C_GossipInfo.SelectOption(gossipOptions[1].gossipOptionID)
-            end
+						DebugMessage("[AutoQuests] Found " .. questOptionsCount .. " quest-related gossip options")
+            if questOptionsCount >= 1 then
+              DebugMessage(L.TITLE .. playerName .. L.GOSSIP)
+              PlaySound(5274, "master")
+							DebugMessage("[AutoQuests] Auto-selecting the first quest option: '" .. (firstQuestOption.name or "nil") .. "' (gossipOptionID: " .. firstQuestOption.gossipOptionID .. ")")
+              C_GossipInfo.SelectOption(firstQuestOption.gossipOptionID)
+						end
         end
     end
 

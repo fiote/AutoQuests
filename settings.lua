@@ -14,7 +14,8 @@ local DEFAULTS = {
     flows = {
         autoAccept = true,
         autoComplete = true,
-        autoSelectGossips = true,
+        autoSelectQuestGossips = true,
+        autoSelectAnySingularGossip = false,
     },
     filters = {
         normalQuestsUnfinished = false,
@@ -91,12 +92,20 @@ function Settings.SetAutoCompleteEnabled(value)
     AutoQuestsDB.flows.autoComplete = value
 end
 
-function Settings.IsAutoSelectGossipsEnabled()
-    return AutoQuestsDB.flows.autoSelectGossips
+function Settings.IsAutoSelectQuestGossipsEnabled()
+    return AutoQuestsDB.flows.autoSelectQuestGossips
 end
 
-function Settings.SetAutoSelectGossipsEnabled(value)
-    AutoQuestsDB.flows.autoSelectGossips = value
+function Settings.SetAutoSelectQuestGossipsEnabled(value)
+    AutoQuestsDB.flows.autoSelectQuestGossips = value
+end
+
+function Settings.IsAutoSelectAnySingularGossipEnabled()
+    return AutoQuestsDB.flows.autoSelectAnySingularGossip
+end
+
+function Settings.SetAutoSelectAnySingularGossipEnabled(value)
+    AutoQuestsDB.flows.autoSelectAnySingularGossip = value
 end
 
 -- Filter getters and setters

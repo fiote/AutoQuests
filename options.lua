@@ -164,7 +164,8 @@ function OptionsPanel.CreatePanel()
     local flowsAnchor = createOptionsSection(frame, L.FLOWS_TITLE, titleLabel, -5, {
         {name = "AutoQuestsAutoAcceptCheckbox", getter = Settings.IsAutoAcceptEnabled, setter = Settings.SetAutoAcceptEnabled, label = L.AUTO_ACCEPT},
         {name = "AutoQuestsAutoCompleteCheckbox", getter = Settings.IsAutoCompleteEnabled, setter = Settings.SetAutoCompleteEnabled, label = L.AUTO_TURN_IN},
-        {name = "AutoQuestsAutoSelectGossipsCheckbox", getter = Settings.IsAutoSelectGossipsEnabled, setter = Settings.SetAutoSelectGossipsEnabled, label = L.AUTO_SELECT_GOSSIPS},
+        {name = "AutoQuestsAutoSelectQuestGossipsCheckbox", getter = Settings.IsAutoSelectQuestGossipsEnabled, setter = Settings.SetAutoSelectQuestGossipsEnabled, label = L.AUTO_SELECT_QUEST_GOSSIPS},
+        {name = "AutoQuestsAutoSelectAnySingularGossipCheckbox", getter = Settings.IsAutoSelectAnySingularGossipEnabled, setter = Settings.SetAutoSelectAnySingularGossipEnabled, label = L.AUTO_SELECT_SINGULAR_GOSSIP},
     })
 
     -- FILTERS SECTION

@@ -17,7 +17,8 @@ L.OPTIONS_PANEL_NAME = "AutoQuests"
 L.FLOWS_TITLE = "Automation Flows"
 L.AUTO_ACCEPT = "Auto Accept"
 L.AUTO_TURN_IN = "Auto Turn-in"
-L.AUTO_SELECT_GOSSIPS = "Auto Select Gossips"
+L.AUTO_SELECT_QUEST_GOSSIPS = "Auto Select Quest Gossips"
+L.AUTO_SELECT_SINGULAR_GOSSIP = "Auto Select Any Singular Gossip"
 
 -- Filters
 L.FILTERS_TITLE = "Quest Filters"

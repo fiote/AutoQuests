@@ -240,32 +240,37 @@ function HandleGossipShow()
 		end
 
     -- Only automate gossip options if auto-select gossips is enabled
-    if Settings.IsAutoSelectGossipsEnabled() then
-        if #gossipOptions == 1 and gossipOptions[1].flags == 1 then
-						DebugMessage("[AutoQuests] Only one gossip option and it's a quest, auto-selecting...")
-            C_GossipInfo.SelectOption(gossipOptions[1].gossipOptionID)
-        else
-						DebugMessage("[AutoQuests] Multiple gossip options found, checking for quest options...")
-            local questOptionsCount = 0
-            local firstQuestOption = nil
-						local firstQuestOptionIndex = nil
-            for index, option in ipairs(gossipOptions) do
-                if option.flags == 1 then
-                    questOptionsCount = questOptionsCount + 1
-                    if firstQuestOption == nil then
-                        firstQuestOption = option
-												firstQuestOptionIndex = index
-                    end
-                end
-            end
-						DebugMessage("[AutoQuests] Found " .. questOptionsCount .. " quest-related gossip options")
-            if questOptionsCount >= 1 then
-              DebugMessage(L.TITLE .. playerName .. L.GOSSIP)
-              PlaySound(5274, "master")
-							DebugMessage("[AutoQuests] Auto-selecting the first quest option: '" .. (firstQuestOption.name or "nil") .. "' (gossipOptionID: " .. firstQuestOption.gossipOptionID .. ")")
-              C_GossipInfo.SelectOption(firstQuestOption.gossipOptionID)
+    if Settings.IsAutoSelectQuestGossipsEnabled() or Settings.IsAutoSelectAnySingularGossipEnabled() then
+			DebugMessage("[AutoQuests] Analyzing gossip options for auto-selection... Total options: " .. #gossipOptions)
+
+			if #gossipOptions == 0 then
+				DebugMessage("[AutoQuests] No gossip options available to select.")
+				return
+			end
+
+			local gossipOptionToSelect = nil
+
+			if not gossipOptionToSelect and #gossipOptions == 1 and Settings.IsAutoSelectAnySingularGossipEnabled() then
+				DebugMessage("[AutoQuests] Singular gossip found.")
+				gossipOptionToSelect = gossipOptions[1]
+			end
+
+			if not gossipOptionToSelect and Settings.IsAutoSelectQuestGossipsEnabled() then
+				for _, option in ipairs(gossipOptions) do
+						if option.flags == 1 then
+								if gossipOptionToSelect == nil then
+										DebugMessage("[AutoQuests] Quest-related gossip found!")
+										gossipOptionToSelect = option
+								end
 						end
-        end
+				end
+			end
+
+			if gossipOptionToSelect then
+					DebugMessage("[AutoQuests] Auto-selecting gossip option: '" .. (gossipOptionToSelect.name or "nil") .. "' (gossipOptionID: " .. gossipOptionToSelect.gossipOptionID .. ")")
+					PlaySound(5274, "master")
+					C_GossipInfo.SelectOption(gossipOptionToSelect.gossipOptionID)
+			end
     end
 
 		local acceptedAnyQuest = false

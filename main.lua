@@ -243,7 +243,7 @@ function HandleGossipShow()
     if Settings.IsAutoSelectGossipsEnabled() then
         if #gossipOptions == 1 and gossipOptions[1].flags == 1 then
 						DebugMessage("[AutoQuests] Only one gossip option and it's a quest, auto-selecting...")
-            -- C_GossipInfo.SelectOption(gossipOptions[1].gossipOptionID)
+            C_GossipInfo.SelectOption(gossipOptions[1].gossipOptionID)
         else
 						DebugMessage("[AutoQuests] Multiple gossip options found, checking for quest options...")
             local questOptionsCount = 0

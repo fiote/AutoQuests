@@ -207,6 +207,15 @@ function HandleQuestAutocomplete(quest)
     ShowQuestComplete(C_QuestLog.GetLogIndexForQuestID(quest.questID))
 end
 
+local function GetGossipOptionLabel(option)
+    return tostring((option and (option.name or option.text)) or "")
+end
+
+local function ShouldSkipAutoGossipOption(option)
+    local optionLabel = string.lower(GetGossipOptionLabel(option))
+    return string.find(optionLabel, "awhile and listen", 1, true) ~= nil
+end
+
 --[[
     Fonction pour gérer l'événement GOSSIP_SHOW
 ]]
@@ -303,17 +312,24 @@ function HandleGossipShow()
         local gossipOptionToSelect = nil
 
         if not gossipOptionToSelect and #gossipOptions == 1 and Settings.IsAutoSelectAnySingularGossipEnabled() then
-            DebugMessage("[AutoQuests] Singular gossip found.")
-            gossipOptionToSelect = gossipOptions[1]
+            local singularOption = gossipOptions[1]
+            if ShouldSkipAutoGossipOption(singularOption) then
+                DebugMessage("[AutoQuests] Singular gossip skipped (awhile/listen): '" .. GetGossipOptionLabel(singularOption) .. "'")
+            else
+                DebugMessage("[AutoQuests] Singular gossip found.")
+                gossipOptionToSelect = singularOption
+            end
         end
 
         if not gossipOptionToSelect and Settings.IsAutoSelectQuestGossipsEnabled() then
             for _, option in ipairs(gossipOptions) do
-                if option.flags == 1 then
+                if option.flags == 1 and not ShouldSkipAutoGossipOption(option) then
                     if gossipOptionToSelect == nil then
                         DebugMessage("[AutoQuests] Quest-related gossip found!")
                         gossipOptionToSelect = option
                     end
+                elseif option.flags == 1 then
+                    DebugMessage("[AutoQuests] Quest-related gossip skipped (awhile/listen): '" .. GetGossipOptionLabel(option) .. "'")
                 end
             end
         end
